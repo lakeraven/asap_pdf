@@ -69,12 +69,7 @@ The application includes several Python components for PDF processing:
 - Policy Reviewer: Checks WCAG 2.1 compliance
 - Document Transformer: Converts PDFs to MD/HTML
 
-To set up the Python components:
-
-```bash
-cd python_components
-pip install -r requirements.txt
-```
+To set up the Python components, follow [these instructions](python_components/README.md).
 
 ## Background Jobs
 
