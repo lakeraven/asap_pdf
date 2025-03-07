@@ -3,15 +3,8 @@
 name: Deploy to Amazon ECS
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-          - production
+  push:
+    branches: [ "main" ]
 
 env:
   AWS_REGION: us-east-1
