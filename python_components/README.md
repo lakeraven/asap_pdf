@@ -1,8 +1,8 @@
 # Python Components
 
-The components in this directory handle various document handling processes. They are intended to be run in AWS Lambda functions in Docker containers. Each component should contain a Lambda entry point (Python script), requirements.txt and Dockerfile minimally.
+The components in this directory cover various document handling processes. They are intended to be run in AWS Lambda functions in Docker containers. Each component should contain a Lambda entry point (Python script), requirements.txt and Dockerfile minimally.
 
-For local development, Lambda compatible components should be setup automatically by running `docker compose up` in the project root.
+For local development, Lambda compatible components should be setup automatically by running `docker compose up` in the project root. Lambda functions should return JSON responses with `statusCode` and `body` keys.
 
 ## Codestyle
 
@@ -10,7 +10,13 @@ The Python components should be PEP8 compliant. They are currently linted with i
 
 Or the `scripts/local_fix_linting.sh` was included to help fix codestyle issues locally.
 
+
+# Summarizer
+
+The Summarizer Python component requires a configuration json file that may be created by visiting the '/configuration/edit' page of the Rails app. Alternatively it may be created manually by copying the example.config.json file in the summary directory.
+
 ## TODO
 
 * Include unit tests when it makes sense.
 * Pull down documents from S3, rather than http request to gov website.
+* Build remaining components.
