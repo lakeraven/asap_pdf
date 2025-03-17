@@ -1,13 +1,10 @@
-from sklearn.preprocessing import MultiLabelBinarizer
-
-import xgboost as xgb
 import urllib.parse
-import pandas as pd
-import numpy as np
 import warnings
-import argparse
-import json
-import re
+
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+from sklearn.preprocessing import MultiLabelBinarizer
 
 warnings.filterwarnings("ignore")
 
@@ -31,11 +28,7 @@ def get_words_around_links(x):
     words_around_link = set([])
     for phrase in x:
         words_around_link.update(
-            [
-                each.lower()
-                for each in re.split("[^a-zA-Z]", phrase)
-                if len(each) > 0
-            ]
+            [each.lower() for each in re.split("[^a-zA-Z]", phrase) if len(each) > 0]
         )
     return list(words_around_link)
 
@@ -57,9 +50,7 @@ def get_features(pdfs_path):
     pdfs["producer"] = pdfs["producer"].astype(str)
     pdfs["producer_keywords"] = pdfs["producer"].apply(
         lambda x: [
-            chars.lower()
-            for chars in re.split("[^a-zA-Z]", x)
-            if ((len(chars) > 0))
+            chars.lower() for chars in re.split("[^a-zA-Z]", x) if ((len(chars) > 0))
         ]
     )
     pdfs["source_keywords"] = pdfs["source_list"].apply(get_words_from_url_list)
