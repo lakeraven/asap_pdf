@@ -8,6 +8,9 @@
       <button data-modal-target="metadataButton" data-action="modal#showMetadataView" class="tab tab-bordered">
         PDF Details
       </button>
+      <button data-modal-target="recommendationButton" data-action="modal#showReccomendationView" class="tab tab-bordered">
+        Accessibility Recommendation
+      </button>
       <button data-modal-target="historyButton" data-action="modal#showHistoryView" class="tab tab-bordered">
         History
       </button>
@@ -103,10 +106,10 @@
             Notes
           </h3>
           <textarea
-          data-modal-notes-target="textarea"
-          class="w-full h-16 p-2 text-sm border rounded-lg focus:border-primary-500 focus:ring-primary-500"
-          placeholder="Add your notes here..."
-        ><%= document.notes %></textarea>
+            data-modal-notes-target="textarea"
+            class="w-full h-16 p-2 text-sm border rounded-lg focus:border-primary-500 focus:ring-primary-500"
+            placeholder="Add your notes here..."
+          ><%= document.notes %></textarea>
           <div class="mt-2 flex justify-end">
             <button class="btn btn-primary btn-sm" data-action="modal-notes#updateNotes">
               <i class="fas fa-save mr-1"></i>
@@ -114,6 +117,30 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+    <!-- Recommendation View -->
+    <div data-modal-target="recommendationView" class="hidden h-[calc(90vh-12rem)] overflow-y-auto">
+      <!-- Recommendation Details -->
+      <div data-controller="recommendation-list" data-recommendation-list-document-id-value="<%= document.id %>" class="col-span-1 md:col-span-2 px-3 pt-4">
+        <div data-recommendation-list-target="display">
+          <% exceptions = document.exceptions(false) %>
+          <% if exceptions.any? %>
+            <%= render partial: "documents/recommendation_list", locals: { document: @document } %>
+          <% end %>
+        </div>
+        <% if exceptions.none? %>
+          <div class="text-left">
+            <button data-recommendation-list-target="button"  data-action="click->recommendation-list#getRecommendationList" class="btn btn-primary btn-sm">
+              <i class="fas fa-wand-magic-sparkles mr-1"></i>
+              Get Recommendation
+            </button>
+            <button data-recommendation-list-target="preloader"  class="btn btn-primary btn-sm hidden">
+              <span class="loading loading-spinner"></span>
+              Getting Recommendation...
+            </button>
+          </div>
+        <% end %>
       </div>
     </div>
     <!-- History View -->
