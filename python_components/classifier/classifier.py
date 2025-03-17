@@ -1,27 +1,20 @@
 import argparse
+import json
 import re
 import urllib.parse
+import warnings
 
 import numpy as np
 import pandas as pd
-import requests
 import xgboost as xgb
-from bs4 import BeautifulSoup
-from tqdm import tqdm
+from sklearn.preprocessing import MultiLabelBinarizer
 
-label_mapping = {
-    0: "Letter",
-    1: "Agenda",
-    2: "Memo",
-    3: "Notice",
-    4: "Flyer",
-    5: "Other",
-    6: "Report",
-    7: "Procurement",
-    8: "Press",
-    9: "Slides",
-    10: "Job Announcement",
-}
+warnings.filterwarnings("ignore")
+
+
+def get_labels():
+    with open("labels.json", "r") as f:
+        return json.load(f)
 
 
 def get_words_from_url_list(x):
@@ -34,35 +27,13 @@ def get_words_from_url_list(x):
     return words
 
 
-def get_words_around_links(pdfs):
-    text_around_link = []
-    for i, row in tqdm(pdfs.iterrows(), total=len(pdfs), ncols=100):
-        # time.sleep(0.5) # Half a second delay?
-        text_around_links = []
-        for source in row["source_list"]:
-            try:
-                response = requests.get(source, timeout=120)  # Get page
-                if response.status_code >= 400:
-                    continue
-
-                html_content = response.content  # Parse the source page
-                soup = BeautifulSoup(html_content, "html.parser")
-                tags = soup.find_all(lambda x: x.get("href") == row["url"])
-
-                words_around_link = set([])  # Get text around the link
-                for tag in tags:
-                    words_around_link.update(
-                        [
-                            each.lower()
-                            for each in re.split("[^a-zA-Z]", tag.get_text())
-                            if len(each) > 0
-                        ]
-                    )
-                text_around_links.extend(list(words_around_link))
-            except Exception:
-                continue
-        text_around_link.append(text_around_links)
-    return text_around_link
+def get_words_around_links(x):
+    words_around_link = set([])
+    for phrase in x:
+        words_around_link.update(
+            [each.lower() for each in re.split("[^a-zA-Z]", phrase) if len(each) > 0]
+        )
+    return list(words_around_link)
 
 
 def get_features(pdfs_path):
@@ -79,6 +50,12 @@ def get_features(pdfs_path):
             if ((len(chars) > 0) and (chars != "pdf"))
         ]
     )
+    pdfs["producer"] = pdfs["producer"].astype(str)
+    pdfs["producer_keywords"] = pdfs["producer"].apply(
+        lambda x: [
+            chars.lower() for chars in re.split("[^a-zA-Z]", x) if ((len(chars) > 0))
+        ]
+    )
     pdfs["source_keywords"] = pdfs["source_list"].apply(get_words_from_url_list)
     pdfs["url_keywords"] = pdfs["url"].apply(
         lambda x: [
@@ -87,12 +64,8 @@ def get_features(pdfs_path):
             if ((len(chars) > 0) and (chars != "pdf"))
         ]
     )
-
-    # Convert the human readable file sizes into numerics.
-    # TODO: Just export the PDF data with sizes in kilobytes / bytes
-    pdfs["file_size_numeric"] = pdfs["file_size"].apply(
-        lambda x: float(x[:-2]) * 1024 if (x[-2:] == "MB") else float(x[:-2])
-    )
+    # Use file size as a feature
+    pdfs["file_size_numeric"] = pdfs["file_size_kilobytes"].astype(float)
 
     # Check for a year in the file name. Could be predictive of an agenda / event
     pdfs["file_name_contains_year"] = pdfs["file_name"].apply(
@@ -100,28 +73,37 @@ def get_features(pdfs_path):
     )
 
     # Get keywords around the links to these PDFs
-    pdfs["url_text_keywords"] = get_words_around_links(pdfs)
+    pdfs["text_around_link"] = pdfs["text_around_link"].apply(eval)
+    pdfs["url_text_keywords"] = pdfs["text_around_link"].apply(get_words_around_links)
     return pdfs
 
 
 def get_feature_matrix(pdfs):
-    file_name_dummies = (
-        pd.get_dummies(pdfs["file_name_keywords"].explode()).groupby(level=0).sum()
+    mlb = MultiLabelBinarizer(sparse_output=True)
+    file_name_dummies = pd.DataFrame.sparse.from_spmatrix(
+        mlb.fit_transform(pdfs["file_name_keywords"])
     )
-    file_name_dummies.columns = "file_" + file_name_dummies.columns
+    file_name_dummies.columns = "file_" + mlb.classes_
 
-    source_dummies = (
-        pd.get_dummies(pdfs["source_keywords"].explode()).groupby(level=0).sum()
+    producer_dummies = pd.DataFrame.sparse.from_spmatrix(
+        mlb.fit_transform(pdfs["producer_keywords"])
     )
-    source_dummies.columns = "source_" + source_dummies.columns
+    producer_dummies.columns = "producer_" + mlb.classes_
 
-    url_dummies = pd.get_dummies(pdfs["url_keywords"].explode()).groupby(level=0).sum()
-    url_dummies.columns = "url_" + url_dummies.columns
-
-    url_text_dummies = (
-        pd.get_dummies(pdfs["url_text_keywords"].explode()).groupby(level=0).sum()
+    source_dummies = pd.DataFrame.sparse.from_spmatrix(
+        mlb.fit_transform(pdfs["source_keywords"])
     )
-    url_text_dummies.columns = "url_text_" + url_text_dummies.columns
+    source_dummies.columns = "source_" + mlb.classes_
+
+    url_dummies = pd.DataFrame.sparse.from_spmatrix(
+        mlb.fit_transform(pdfs["url_keywords"])
+    )
+    url_dummies.columns = "url_" + mlb.classes_
+
+    url_text_dummies = pd.DataFrame.sparse.from_spmatrix(
+        mlb.fit_transform(pdfs["url_text_keywords"])
+    )
+    url_text_dummies.columns = "url_text_" + mlb.classes_
 
     X = pd.concat(
         [
@@ -143,6 +125,10 @@ def get_predictions(feature_matrix, model_path):
     model_features = set(model.get_booster().feature_names)
     candidate_features = set(feature_matrix.columns)
     missing_features = list(model_features - candidate_features)
+
+    # Before we add any missing features, drop the ones the model hasn't seen
+    unseen_labels = list(candidate_features - model_features)
+    feature_matrix.drop(labels=unseen_labels, inplace=True, axis=1)
     if len(missing_features) > 0:
         missing_feature_matrix = pd.DataFrame(
             np.zeros((len(feature_matrix), len(missing_features))),
@@ -163,6 +149,9 @@ def get_predictions(feature_matrix, model_path):
     prediction_labels = [label_mapping[pred] for pred in predictions]
     return prediction_labels, confidences
 
+
+labels = get_labels()
+label_mapping = {ind: label for label, ind in labels.items()}
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
