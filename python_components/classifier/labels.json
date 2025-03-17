@@ -1,0 +1,16 @@
+{
+    "Letter": 0,
+    "Agenda": 1,
+    "Report": 2,
+    "Notice": 3,
+    "Flyer": 4,
+    "Spreadsheet": 5,
+    "Policy": 6,
+    "Form": 7,
+    "Diagram": 8,
+    "Procurement": 9,
+    "Job": 10,
+    "Press": 11,
+    "Brochure": 12,
+    "Slides": 13
+}
