@@ -16,7 +16,6 @@ gem "tzinfo-data", platforms: %i[windows jruby]
 gem "solid_cache"
 
 gem "bootsnap", require: false
-gem "kamal", "~> 2.5.3", require: false
 gem "thruster", require: false
 gem "redis", "~> 5.4.0"
 gem "sidekiq", "~> 8.0"
