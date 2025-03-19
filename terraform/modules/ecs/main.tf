@@ -107,6 +107,10 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = var.db_password_secret_arn
         },
         {
+          name      = "SECRET_KEY_BASE"
+          valueFrom = var.secret_key_base_secret_arn
+        },
+        {
           name      = "RAILS_MASTER_KEY"
           valueFrom = var.rails_master_key_secret_arn
         },

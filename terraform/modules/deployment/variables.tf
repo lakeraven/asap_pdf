@@ -53,3 +53,9 @@ variable "redis_url" {
   description = "Redis connection URL"
   type        = string
 }
+
+variable "secret_key_base" {
+  description = "Rails secret key base for production"
+  type        = string
+  sensitive   = true
+}

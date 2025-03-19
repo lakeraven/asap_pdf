@@ -30,6 +30,10 @@ output "rails_master_key_secret_arn" {
   value = aws_secretsmanager_secret.rails_master_key.arn
 }
 
+output "secret_key_base_secret_arn" {
+  value = aws_secretsmanager_secret.secret_key_base.arn
+}
+
 output "redis_url_secret_arn" {
   value = aws_secretsmanager_secret.redis_url.arn
 }

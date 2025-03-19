@@ -206,6 +206,21 @@ resource "aws_secretsmanager_secret_version" "rails_master_key" {
   secret_string = var.rails_master_key
 }
 
+# Secret Key Base Secret
+resource "aws_secretsmanager_secret" "secret_key_base" {
+  name = "${var.project_name}/${var.environment}/SECRET_KEY_BASE"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-secret-key-base"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "secret_key_base" {
+  secret_id     = aws_secretsmanager_secret.secret_key_base.id
+  secret_string = var.secret_key_base
+}
+
 # Redis URL Secret
 resource "aws_secretsmanager_secret" "redis_url" {
   name = "${var.project_name}/${var.environment}/REDIS_URL"

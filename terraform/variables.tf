@@ -108,3 +108,9 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "secret_key_base" {
+  description = "Rails secret key base for production"
+  type        = string
+  sensitive   = true
+}

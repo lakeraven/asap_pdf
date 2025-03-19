@@ -58,6 +58,11 @@ variable "db_password_secret_arn" {
   type        = string
 }
 
+variable "secret_key_base_secret_arn" {
+  description = "ARN of the Rails secret key base secret in Secrets Manager"
+  type        = string
+}
+
 variable "rails_master_key_secret_arn" {
   description = "ARN of the Rails master key secret in Secrets Manager"
   type        = string

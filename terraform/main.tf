@@ -54,6 +54,7 @@ module "deployment" {
     module.cache.redis_endpoint,
     module.cache.redis_port
   )
+  secret_key_base = var.secret_key_base
 }
 
 # ECS
@@ -73,6 +74,7 @@ module "ecs" {
   db_name_secret_arn          = module.deployment.db_name_secret_arn
   db_username_secret_arn      = module.deployment.db_username_secret_arn
   db_password_secret_arn      = module.deployment.db_password_secret_arn
+  secret_key_base_secret_arn  = module.deployment.secret_key_base_secret_arn
   rails_master_key_secret_arn = module.deployment.rails_master_key_secret_arn
   redis_url_secret_arn        = module.deployment.redis_url_secret_arn
   target_group_arn            = module.networking.alb_target_group_arn
@@ -146,6 +148,7 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
           module.deployment.db_name_secret_arn,
           module.deployment.db_username_secret_arn,
           module.deployment.db_password_secret_arn,
+          module.deployment.secret_key_base_secret_arn,
           module.deployment.rails_master_key_secret_arn,
           module.deployment.redis_url_secret_arn
         ]
