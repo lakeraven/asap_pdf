@@ -48,7 +48,12 @@ variable "rails_master_key_secret_arn" {
   type        = string
 }
 
-variable "redis_url" {
-  description = "Redis URL for the application"
+variable "redis_url_secret_arn" {
+  description = "ARN of the Redis URL secret in Secrets Manager"
+  type        = string
+}
+
+variable "target_group_arn" {
+  description = "ARN of the ALB target group"
   type        = string
 }

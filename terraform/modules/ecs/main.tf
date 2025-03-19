@@ -67,10 +67,6 @@ resource "aws_ecs_task_definition" "app" {
           value = tostring(var.container_port)
         },
         {
-          name  = "REDIS_URL"
-          value = var.redis_url
-        },
-        {
           name  = "WEB_CONCURRENCY"
           value = "2"
         },
@@ -100,6 +96,10 @@ resource "aws_ecs_task_definition" "app" {
         {
           name      = "RAILS_MASTER_KEY"
           valueFrom = var.rails_master_key_secret_arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = var.redis_url_secret_arn
         }
       ]
 
@@ -161,7 +161,13 @@ resource "aws_ecs_service" "app" {
   network_configuration {
     subnets          = var.subnet_ids
     security_groups  = [var.security_group_id]
-    assign_public_ip = true
+    assign_public_ip = false
+  }
+
+  load_balancer {
+    target_group_arn = var.target_group_arn
+    container_name   = "app"
+    container_port   = var.container_port
   }
 
   tags = {

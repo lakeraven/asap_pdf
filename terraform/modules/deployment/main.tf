@@ -161,3 +161,18 @@ resource "aws_secretsmanager_secret_version" "rails_master_key" {
   secret_id     = aws_secretsmanager_secret.rails_master_key.id
   secret_string = var.rails_master_key
 }
+
+# Redis URL Secret
+resource "aws_secretsmanager_secret" "redis_url" {
+  name = "${var.project_name}/${var.environment}/REDIS_URL"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-redis-url"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "redis_url" {
+  secret_id     = aws_secretsmanager_secret.redis_url.id
+  secret_string = var.redis_url
+}

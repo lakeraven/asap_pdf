@@ -50,6 +50,10 @@ module "deployment" {
   db_name                = var.db_name
   rails_master_key       = var.rails_master_key
   aws_account_id         = var.aws_account_id
+  redis_url = format("redis://%s:%s",
+    module.cache.redis_endpoint,
+    module.cache.redis_port
+  )
 }
 
 # ECS
@@ -58,7 +62,7 @@ module "ecs" {
 
   project_name      = var.project_name
   environment       = var.environment
-  subnet_ids        = module.networking.public_subnet_ids
+  subnet_ids        = module.networking.private_subnet_ids
   security_group_id = module.networking.ecs_security_group_id
   container_image   = "${module.deployment.ecr_repository_url}:latest"
   container_port    = var.container_port
@@ -67,11 +71,8 @@ module "ecs" {
 
   database_url_secret_arn     = module.deployment.database_url_secret_arn
   rails_master_key_secret_arn = module.deployment.rails_master_key_secret_arn
-
-  redis_url = format("redis://%s:%s",
-    module.cache.redis_endpoint,
-    module.cache.redis_port
-  )
+  redis_url_secret_arn        = module.deployment.redis_url_secret_arn
+  target_group_arn            = module.networking.alb_target_group_arn
 }
 
 # S3 bucket for PDF storage
@@ -139,7 +140,8 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
         Action = "secretsmanager:GetSecretValue"
         Resource = [
           module.deployment.database_url_secret_arn,
-          module.deployment.rails_master_key_secret_arn
+          module.deployment.rails_master_key_secret_arn,
+          module.deployment.redis_url_secret_arn
         ]
       }
     ]
