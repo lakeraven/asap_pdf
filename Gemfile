@@ -24,7 +24,6 @@ gem "redis", "~> 5.4.0"
 gem "sidekiq", "~> 8.0"
 
 gem "view_component", "~> 3.21"
-gem "overcommit", "~> 0.67.1"
 gem "kaminari", "~> 1.2"
 
 group :development, :test do
@@ -35,6 +34,7 @@ group :development, :test do
 end
 
 group :development do
+  gem "overcommit", "~> 0.67.1"
   gem "better_errors", "~> 2.10"
   gem "ruby-lsp", "~> 0.23"
   gem "web-console"
@@ -55,7 +55,6 @@ group :test do
 end
 
 gem "bcrypt", "~> 3.1"
-gem "state_machines", "~> 0.6.0"
 gem "aws-sdk-s3", "~> 1.182"  # For S3 versioning support
 
 # API and Documentation
@@ -63,5 +62,4 @@ gem "grape", "~> 2.3"
 gem "grape-swagger"
 
 gem "paper_trail", "~> 16.0"
-
 gem "tailwindcss-ruby", "~> 4.0"
