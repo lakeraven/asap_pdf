@@ -9,6 +9,4 @@ test:
   adapter: test
 
 production:
-  adapter: solid_cable
-  polling_interval: 0.1
-  message_retention: 1.day
+  adapter: async
