@@ -16,8 +16,8 @@ test:
 
 production:
   <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
-  connect_timeout: 2
-  checkout_timeout: 5
+  url: <%= CGI.unescape(ENV['DATABASE_URL']) if ENV['DATABASE_URL'] %>
+  connect_timeout: 5
+  checkout_timeout: 10
   variables:
     statement_timeout: 10000 # 10 seconds
