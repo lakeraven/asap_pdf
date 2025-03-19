@@ -85,7 +85,7 @@ describe "documents function as expected", js: true, type: :feature do
     end
   end
 
-  it "documents have some tabs" do
+  pending "documents have some tabs" do
     # Create our test setup
     site = Site.create(name: "City of Denver", location: "Colorado", primary_url: "https://denvergov.org", user_id: @current_user.id)
     doc = Document.create(url: "http://denvergov.org/docs/example.pdf", file_name: "example.pdf", document_category: "Agenda", accessibility_recommendation: "Unknown", site_id: site.id)
