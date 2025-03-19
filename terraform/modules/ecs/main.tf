@@ -147,14 +147,6 @@ resource "aws_ecs_task_definition" "app" {
         }
       ]
 
-      healthCheck = {
-        command     = ["CMD-SHELL", "/rails/bin/healthcheck"]
-        interval    = 30
-        timeout     = 10
-        retries     = 2
-        startPeriod = 60
-      }
-
       stopTimeout = 120
 
       logConfiguration = {
