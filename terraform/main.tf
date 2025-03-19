@@ -1,14 +1,3 @@
-# Data source for latest Amazon ECS-optimized AMI
-data "aws_ami" "ecs" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-ecs-hvm-*-x86_64-ebs"]
-  }
-}
-
 # Networking
 module "networking" {
   source = "./modules/networking"
@@ -71,15 +60,10 @@ module "ecs" {
   environment       = var.environment
   subnet_ids        = module.networking.public_subnet_ids
   security_group_id = module.networking.ecs_security_group_id
-  ami_id            = data.aws_ami.ecs.id
-  instance_type     = var.ecs_instance_type
-  min_size          = var.ecs_min_size
-  max_size          = var.ecs_max_size
-
-  container_image  = "${module.deployment.ecr_repository_url}:latest"
-  container_port   = var.container_port
-  container_cpu    = var.container_cpu
-  container_memory = var.container_memory
+  container_image   = "${module.deployment.ecr_repository_url}:latest"
+  container_port    = var.container_port
+  container_cpu     = var.container_cpu
+  container_memory  = var.container_memory
 
   database_url_secret_arn     = module.deployment.database_url_secret_arn
   rails_master_key_secret_arn = module.deployment.rails_master_key_secret_arn

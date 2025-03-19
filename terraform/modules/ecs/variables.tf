@@ -9,33 +9,13 @@ variable "environment" {
 }
 
 variable "subnet_ids" {
-  description = "List of subnet IDs for the ECS tasks"
+  description = "List of subnet IDs for the Fargate tasks"
   type        = list(string)
 }
 
 variable "security_group_id" {
-  description = "Security group ID for the ECS tasks"
+  description = "Security group ID for the Fargate tasks"
   type        = string
-}
-
-variable "ami_id" {
-  description = "AMI ID for ECS instances"
-  type        = string
-}
-
-variable "instance_type" {
-  description = "Instance type for ECS instances"
-  type        = string
-}
-
-variable "min_size" {
-  description = "Minimum size of the Auto Scaling Group"
-  type        = number
-}
-
-variable "max_size" {
-  description = "Maximum size of the Auto Scaling Group"
-  type        = number
 }
 
 variable "container_image" {
@@ -49,12 +29,12 @@ variable "container_port" {
 }
 
 variable "container_cpu" {
-  description = "CPU units for the container"
+  description = "CPU units for the Fargate task (256 = 0.25 vCPU, 512 = 0.5 vCPU, 1024 = 1 vCPU)"
   type        = number
 }
 
 variable "container_memory" {
-  description = "Memory for the container in MiB"
+  description = "Memory for the Fargate task in MiB (512, 1024, 2048, etc.)"
   type        = number
 }
 
