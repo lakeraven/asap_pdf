@@ -36,26 +36,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Add permissions for Secrets Manager access
-resource "aws_iam_role_policy" "ecs_task_secrets_policy" {
-  name = "${var.project_name}-${var.environment}-task-secrets-policy"
-  role = aws_iam_role.ecs_task_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "secretsmanager:GetSecretValue"
-        Resource = [
-          "arn:aws:secretsmanager:us-east-1:225989367355:secret:asap-pdf/production/DATABASE_URL",
-          "arn:aws:secretsmanager:us-east-1:225989367355:secret:asap-pdf/production/RAILS_MASTER_KEY"
-        ]
-      }
-    ]
-  })
-}
-
 # Task definition
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.project_name}-${var.environment}-app"

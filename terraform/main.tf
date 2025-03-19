@@ -125,3 +125,23 @@ resource "aws_iam_role_policy" "ecs_s3_access" {
     ]
   })
 }
+
+# IAM policy for ECS tasks to access Secrets Manager
+resource "aws_iam_role_policy" "ecs_secrets_access" {
+  name = "${var.project_name}-${var.environment}-ecs-secrets-access"
+  role = split("/", module.ecs.task_execution_role_arn)[1]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "secretsmanager:GetSecretValue"
+        Resource = [
+          module.deployment.database_url_secret_arn,
+          module.deployment.rails_master_key_secret_arn
+        ]
+      }
+    ]
+  })
+}
