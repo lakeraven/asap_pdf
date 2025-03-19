@@ -16,7 +16,11 @@ test:
 
 production:
   <<: *default
-  url: <%= CGI.unescape(ENV['DATABASE_URL']) if ENV['DATABASE_URL'] %>
+  host: <%= ENV['DB_HOST'] %>
+  port: 5432
+  database: <%= ENV['DB_NAME'] %>
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
   connect_timeout: 5
   checkout_timeout: 10
   variables:

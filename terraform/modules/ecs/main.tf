@@ -91,8 +91,20 @@ resource "aws_ecs_task_definition" "app" {
 
       secrets = [
         {
-          name      = "DATABASE_URL"
-          valueFrom = var.database_url_secret_arn
+          name      = "DB_HOST"
+          valueFrom = var.db_host_secret_arn
+        },
+        {
+          name      = "DB_NAME"
+          valueFrom = var.db_name_secret_arn
+        },
+        {
+          name      = "DB_USERNAME"
+          valueFrom = var.db_username_secret_arn
+        },
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = var.db_password_secret_arn
         },
         {
           name      = "RAILS_MASTER_KEY"

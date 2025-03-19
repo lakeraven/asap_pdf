@@ -19,7 +19,6 @@ resource "aws_ecr_repository" "app" {
 }
 
 # GitHub OIDC Provider
-# https://github.blog/changelog/2023-06-27-github-actions-update-on-oidc-integration-with-aws/
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://token.actions.githubusercontent.com"
 
@@ -123,28 +122,73 @@ resource "aws_iam_role_policy" "github_actions" {
   })
 }
 
-# Database URL Secret
-resource "aws_secretsmanager_secret" "database_url" {
-  name = "${var.project_name}/${var.environment}/DATABASE_URL"
+# Database Host Secret
+resource "aws_secretsmanager_secret" "db_host" {
+  name = "${var.project_name}/${var.environment}/DB_HOST"
 
   tags = {
-    Name        = "${var.project_name}-${var.environment}-database-url"
+    Name        = "${var.project_name}-${var.environment}-db-host"
     Environment = var.environment
   }
 }
 
-data "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = var.db_password_secret_arn
+resource "aws_secretsmanager_secret_version" "db_host" {
+  secret_id     = aws_secretsmanager_secret.db_host.id
+  secret_string = var.db_endpoint
 }
 
-resource "aws_secretsmanager_secret_version" "database_url" {
-  secret_id = aws_secretsmanager_secret.database_url.id
-  secret_string = format("postgres://%s:%s@%s/%s",
-    var.db_username,
-    data.aws_secretsmanager_secret_version.db_password.secret_string,
-    var.db_endpoint,
-    var.db_name
-  )
+# Database Name Secret
+resource "aws_secretsmanager_secret" "db_name" {
+  name = "${var.project_name}/${var.environment}/DB_NAME"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-db-name"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_name" {
+  secret_id     = aws_secretsmanager_secret.db_name.id
+  secret_string = var.db_name
+}
+
+# Database Username Secret
+resource "aws_secretsmanager_secret" "db_username" {
+  name = "${var.project_name}/${var.environment}/DB_USERNAME"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-db-username"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_username" {
+  secret_id     = aws_secretsmanager_secret.db_username.id
+  secret_string = var.db_username
+}
+
+# Database Password Secret (using existing secret)
+resource "aws_secretsmanager_secret" "db_password" {
+  name = "${var.project_name}/${var.environment}/DB_PASSWORD"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-db-password"
+    Environment = var.environment
+  }
+}
+
+# Get the existing password from the provided secret ARN
+data "aws_secretsmanager_secret" "db_password" {
+  arn = var.db_password_secret_arn
+}
+
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = data.aws_secretsmanager_secret.db_password.id
+}
+
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
+  secret_string = data.aws_secretsmanager_secret_version.db_password.secret_string
 }
 
 # Rails Master Key Secret

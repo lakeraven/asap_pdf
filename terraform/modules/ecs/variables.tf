@@ -38,8 +38,23 @@ variable "container_memory" {
   type        = number
 }
 
-variable "database_url_secret_arn" {
-  description = "ARN of the database URL secret in Secrets Manager"
+variable "db_host_secret_arn" {
+  description = "ARN of the database host secret in Secrets Manager"
+  type        = string
+}
+
+variable "db_name_secret_arn" {
+  description = "ARN of the database name secret in Secrets Manager"
+  type        = string
+}
+
+variable "db_username_secret_arn" {
+  description = "ARN of the database username secret in Secrets Manager"
+  type        = string
+}
+
+variable "db_password_secret_arn" {
+  description = "ARN of the database password secret in Secrets Manager"
   type        = string
 }
 

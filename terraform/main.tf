@@ -69,7 +69,10 @@ module "ecs" {
   container_cpu     = var.container_cpu
   container_memory  = var.container_memory
 
-  database_url_secret_arn     = module.deployment.database_url_secret_arn
+  db_host_secret_arn          = module.deployment.db_host_secret_arn
+  db_name_secret_arn          = module.deployment.db_name_secret_arn
+  db_username_secret_arn      = module.deployment.db_username_secret_arn
+  db_password_secret_arn      = module.deployment.db_password_secret_arn
   rails_master_key_secret_arn = module.deployment.rails_master_key_secret_arn
   redis_url_secret_arn        = module.deployment.redis_url_secret_arn
   target_group_arn            = module.networking.alb_target_group_arn
@@ -139,7 +142,10 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
         Effect = "Allow"
         Action = "secretsmanager:GetSecretValue"
         Resource = [
-          module.deployment.database_url_secret_arn,
+          module.deployment.db_host_secret_arn,
+          module.deployment.db_name_secret_arn,
+          module.deployment.db_username_secret_arn,
+          module.deployment.db_password_secret_arn,
           module.deployment.rails_master_key_secret_arn,
           module.deployment.redis_url_secret_arn
         ]
