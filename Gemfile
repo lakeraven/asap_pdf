@@ -14,8 +14,6 @@ gem "rest-client"
 gem "tzinfo-data", platforms: %i[windows jruby]
 
 gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
 
 gem "bootsnap", require: false
 gem "kamal", "~> 2.5.3", require: false
