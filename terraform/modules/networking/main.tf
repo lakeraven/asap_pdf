@@ -233,13 +233,13 @@ resource "aws_lb_target_group" "app" {
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    interval            = 120
+    interval            = 30
     matcher             = "200"
     path                = "/up"
     port                = "traffic-port"
     protocol            = "HTTP"
-    timeout             = 30
-    unhealthy_threshold = 5
+    timeout             = 5
+    unhealthy_threshold = 3
   }
 
   tags = {

@@ -24,6 +24,6 @@ redis_node_type = "cache.t3.micro"
 redis_port      = 6379
 
 # Container Configuration
-container_port   = 80
+container_port   = 3000
 container_cpu    = 1024  # 1 vCPU
 container_memory = 2048  # 2GB memory
