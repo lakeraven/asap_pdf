@@ -14,7 +14,7 @@ The infrastructure consists of:
 
 ## Prerequisites
 
-1. AWS CLI configured with appropriate credentials
+1. AWS CLI configured with appropriate credentials. Example: `aws configure --profile cfa-ai-studio`
 2. OpenTofu installed (v1.0.0 or later)
 3. Docker image built and pushed to a container registry
 
