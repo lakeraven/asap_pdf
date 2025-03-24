@@ -76,6 +76,7 @@ resource "aws_ecs_task_definition" "app" {
     {
       name  = "app"
       image = var.container_image
+      enable_execute_command  = true
 
       portMappings = [
         {

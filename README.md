@@ -134,6 +134,9 @@ Once the application is running:
   - Returns site details excluding user_id, created_at, updated_at
   - Includes s3_endpoint
 
+- `POST /api/v1/documents/inference`
+    - Adds or updates a document inference record.
+
 ## Document Storage
 
 The application uses S3 with automatic versioning to track document changes over time. This allows us to maintain a complete history of each document as it changes externally (e.g., when a city updates their PDF) or internally (e.g., after accessibility improvements).
