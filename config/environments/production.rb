@@ -17,7 +17,7 @@ Rails.application.configure do
     "X-Forwarded-Proto" => "https"
   }
 
-  config.ssl_options = {exclude: ->(request) { request.path =~ /^\/up/ }}
+  config.ssl_options = {redirect: {exclude: ->(request) { request.path == "/up" }}}
 
   config.log_tags = [:request_id]
   config.logger = ActiveSupport::TaggedLogging.logger($stdout)
