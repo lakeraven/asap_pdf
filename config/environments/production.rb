@@ -14,7 +14,7 @@ Rails.application.configure do
   config.force_ssl = true
 
   config.action_dispatch.default_headers = {
-    'X-Forwarded-Proto' => 'https'
+    "X-Forwarded-Proto" => "https"
   }
 
   config.log_tags = [:request_id]
@@ -31,4 +31,3 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
   config.active_record.attributes_for_inspect = [:id]
 end
-
