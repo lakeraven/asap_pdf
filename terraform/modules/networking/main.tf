@@ -258,3 +258,18 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
+
+# ACM Certificate
+resource "aws_acm_certificate" "main" {
+  # NB: Tofu plan fails here, because this is not defined.
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "${var.project_name}-cert"
+  }
+}
