@@ -44,7 +44,6 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-
 # Install JavaScript dependencies
 ARG NODE_VERSION=23.4.0
 ARG YARN_VERSION=1.22.22
@@ -95,4 +94,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["./bin/thrust", "./bin/rails", "server"]
+CMD ["/etc/amazon/ssm/amazon-ssm-agent", "&", "./bin/thrust", "./bin/rails", "server"]

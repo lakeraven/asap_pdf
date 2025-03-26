@@ -90,6 +90,13 @@ resource "aws_iam_role_policy" "ecs_task_exec_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        "Effect": "Allow",
+        "Action": [
+          "ecs:ExecuteCommand"
+        ],
+        "Resource": "*"
+      },
+      {
         Effect = "Allow"
         Action = [
           "ssmmessages:CreateControlChannel",
