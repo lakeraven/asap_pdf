@@ -33,14 +33,12 @@ RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y build-essential git node-gyp pkg-config python-is-python3 libpq-dev && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Install AWS session manager, so we can exec things.
+# Install AWS session manager agent, so we can exec things.
 RUN apt-get update && apt-get install -y \
-    curl \
-    gpg \
-    unzip \
-    && curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" \
-    && dpkg -i session-manager-plugin.deb \
-    && rm session-manager-plugin.deb \
+    wget \
+    && wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb \
+    && dpkg -i amazon-ssm-agent.deb \
+    && rm amazon-ssm-agent.deb \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -94,4 +92,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 3000
-CMD ["/etc/amazon/ssm/amazon-ssm-agent", "&", "./bin/thrust", "./bin/rails", "server"]
+CMD ["amazon-ssm-agent", "&", "./bin/thrust", "./bin/rails", "server"]
