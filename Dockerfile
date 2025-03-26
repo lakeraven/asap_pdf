@@ -33,15 +33,6 @@ RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y build-essential git node-gyp pkg-config python-is-python3 libpq-dev && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
-# Install AWS session manager agent, so we can exec things.
-RUN curl -L https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb -o amazon-ssm-agent.deb \
-    && dpkg -i amazon-ssm-agent.deb \
-    && rm amazon-ssm-agent.deb \
-    && which amazon-ssm-agent || echo "SSM Agent not found" \
-    && ls /opt/amazon/ssm || echo "SSM directory not found" \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install JavaScript dependencies
 ARG NODE_VERSION=23.4.0
 ARG YARN_VERSION=1.22.22

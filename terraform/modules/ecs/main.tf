@@ -63,6 +63,34 @@ resource "aws_iam_role_policy" "ecs_task_secrets_policy" {
   })
 }
 
+resource "aws_iam_role_policy" "ecs_task_cli_exec" {
+  name = "${var.project_name}-${var.environment}-task-cli-exec-policy"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecs:ExecuteCommand"
+        ],
+        "Resource": "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # IAM role for ECS tasks (task role)
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.project_name}-${var.environment}-task-role"
