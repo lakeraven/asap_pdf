@@ -30,3 +30,6 @@ fi
 
 echo "Starting command: ${@}"
 exec "${@}"
+
+# Try to start the SSM Agent
+amazon-ssm-agent &
