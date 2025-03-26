@@ -136,6 +136,7 @@ Once the application is running:
 
 - `POST /api/v1/documents/inference`
     - Adds or updates a document inference record.
+    - Ideally used for storing AI results for documents.
 
 ## Document Storage
 
