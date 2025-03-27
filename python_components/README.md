@@ -20,3 +20,4 @@ The Summarizer Python component requires a configuration json file that may be c
 * Include unit tests when it makes sense.
 * Pull down documents from S3, rather than http request to gov website.
 * Build remaining components.
+* Add prototype of LLM evaluation
