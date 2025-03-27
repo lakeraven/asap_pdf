@@ -42,7 +42,10 @@ environment  = "production"
 db_instance_class = "db.t3.small"
 redis_node_type   = "cache.t3.micro"
 container_image   = "your-registry/asap-pdf:latest"
+aws_account_id    = "Your AWS Account #"
 ```
+
+NB: If adding `aws_account_id` to prevent OpenTofu prompting for account, make sure to wrap in quotes to include all characters.
 
 3. Review the execution plan:
 ```bash
