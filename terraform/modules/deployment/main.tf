@@ -236,3 +236,32 @@ resource "aws_secretsmanager_secret_version" "redis_url" {
   secret_id     = aws_secretsmanager_secret.redis_url.id
   secret_string = var.redis_url
 }
+
+# Google/Gemini API Keys
+resource "aws_secretsmanager_secret" "google_ai_key" {
+  name = "${var.project_name}/${var.environment}/GOOGLE_AI_KEY"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-google-ai-key"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "google_ai_key" {
+  secret_id     = aws_secretsmanager_secret.google_ai_key.id
+  secret_string = var.google_ai_key
+}
+
+resource "aws_secretsmanager_secret" "anthropic_key" {
+  name = "${var.project_name}/${var.environment}/ANTHROPIC_KEY"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-anthropic-key"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "anthropic_key" {
+  secret_id     = aws_secretsmanager_secret.anthropic_key.id
+  secret_string = var.anthropic_key
+}

@@ -55,6 +55,8 @@ module "deployment" {
     module.cache.redis_port
   )
   secret_key_base = var.secret_key_base
+  google_ai_key = var.google_ai_key
+  anthropic_key = var.anthropic_key
 }
 
 # ECS
