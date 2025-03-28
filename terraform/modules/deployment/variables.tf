@@ -72,3 +72,8 @@ variable "anthropic_key" {
   sensitive   = true
 }
 
+variable "document_inference_lambda_arn" {
+  description = "The document inference Lambda arn."
+  type        = string
+}
+

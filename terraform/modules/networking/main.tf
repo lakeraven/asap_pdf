@@ -127,6 +127,24 @@ resource "aws_security_group" "ecs" {
   }
 }
 
+resource "aws_security_group" "lambda" {
+  name        = "${var.project_name}-${var.environment}-lambda-sg"
+  description = "Security group for Lambda functions"
+  vpc_id      = aws_vpc.main.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-lambda-sg"
+  }
+}
+
+
 resource "aws_security_group" "rds" {
   name        = "${var.project_name}-${var.environment}-rds-sg"
   description = "Security group for RDS instance"

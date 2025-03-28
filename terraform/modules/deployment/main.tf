@@ -1,4 +1,30 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.81.0"
+    }
+  }
+}
 # Main application ECR Repository
+data "aws_iam_policy_document" "lambda_ecr" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      identifiers = ["*"]
+      type = "AWS"
+    }
+
+    actions = [
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:GetRepositoryPolicy",
+      "ecr:SetRepositoryPolicy",
+    ]
+  }
+}
+
 resource "aws_ecr_repository" "app" {
   name                 = "${var.project_name}-${var.environment}"
   force_delete         = true
@@ -35,6 +61,11 @@ resource "aws_ecr_repository" "document_inference" {
     Name        = "${var.project_name}-${var.environment}"
     Environment = var.environment
   }
+}
+
+resource "aws_ecr_repository_policy" "document_inference" {
+  policy  = data.aws_iam_policy_document.lambda_ecr.json
+  repository = aws_ecr_repository.document_inference.name
 }
 
 # GitHub OIDC Provider
@@ -136,6 +167,15 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = [
           "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-task-execution-role",
           "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-task-role"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:UpdateFunctionCode"
+        ]
+        Resource = [
+          var.document_inference_lambda_arn
         ]
       }
     ]

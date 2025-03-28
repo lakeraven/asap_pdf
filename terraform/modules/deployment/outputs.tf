@@ -46,3 +46,7 @@ output "anthropic_key_secret_arn" {
   value = aws_secretsmanager_secret.anthropic_key.arn
 }
 
+output "document_inference_ecr_repository_url" {
+  value = aws_ecr_repository.document_inference.repository_url
+}
+
