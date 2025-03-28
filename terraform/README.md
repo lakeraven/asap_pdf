@@ -11,6 +11,7 @@ The infrastructure consists of:
 - Redis cluster for Sidekiq in private subnet
 - ECS cluster with EC2 instances in public subnet
 - S3 bucket for PDF storage with versioning enabled
+- Lambda for running Python components
 
 ## Prerequisites
 
