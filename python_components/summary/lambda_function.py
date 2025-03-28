@@ -93,13 +93,15 @@ def handler(event, context):
         )
         logger.info(f"Page limit set to {page_limit}.")
         logger.info(f"Attempting to fetch document: {event['document_url']}")
-
+        # Create our data directory.
+        if not os.path.exists("/tmp/data"):
+            os.makedirs("/tmp/data")
         # Download file locally.
-        local_path = get_file(event["document_url"], "./data")
+        local_path = get_file(event["document_url"], "/tmp/data")
 
         # Convert to images.
         logger.info("Converting to images!")
-        attachments = pdf_to_attachments(local_path, "./data", event["page_limit"])
+        attachments = pdf_to_attachments(local_path, "/tmp/data", event["page_limit"])
         num_attachments = len(attachments)
         logger.info(f"Document has {num_attachments} pages.")
 
