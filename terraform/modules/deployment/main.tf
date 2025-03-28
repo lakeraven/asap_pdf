@@ -1,4 +1,4 @@
-# ECR Repository
+# Main application ECR Repository
 resource "aws_ecr_repository" "app" {
   name                 = "${var.project_name}-${var.environment}"
   force_delete         = true
@@ -12,6 +12,25 @@ resource "aws_ecr_repository" "app" {
     encryption_type = "AES256"
   }
 
+  tags = {
+    Name        = "${var.project_name}-${var.environment}"
+    Environment = var.environment
+  }
+}
+
+# Document inference ECR repository.
+resource "aws_ecr_repository" "document_inference" {
+  name                 = "${var.project_name}-lambda-document-inference-${var.environment}"
+  force_delete         = true
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
   tags = {
     Name        = "${var.project_name}-${var.environment}"
     Environment = var.environment
