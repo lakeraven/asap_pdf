@@ -64,7 +64,7 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: ${{ env.ECR_APP_REPOSITORY }}
+        ECR_REPOSITORY: ${{ env.ECR_APP_REPOSITORY }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -94,7 +94,7 @@ jobs:
       id: build-document-inference-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: ${{ env.ECR_DOCUMENT_INFERENCE_REPOSITORY }}
+        ECR_REPOSITORY: ${{ env.ECR_DOCUMENT_INFERENCE_REPOSITORY }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG python_components/summary/.
