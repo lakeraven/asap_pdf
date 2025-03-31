@@ -2,7 +2,7 @@ resource "aws_lambda_function" "document_inference" {
   function_name = "${var.project_name}-document-inference-${var.environment}"
   image_uri     = "${var.document_inference_ecr_repository_url}:latest"
   package_type  = "Image"
-  timeout = 15
+  timeout = 180
 
   vpc_config {
     security_group_ids = [var.security_group_id]
