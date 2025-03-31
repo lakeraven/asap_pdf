@@ -145,7 +145,11 @@ class Document < ApplicationRecord
 
   def inference_summary!
     if summary.nil?
-      endpoint_url = "http://localhost:9000/2015-03-31/functions/function/invocations"
+      if Rails.env.to_s != "production"
+        endpoint_url = "http://localhost:9000/2015-03-31/functions/function/invocations"
+      else
+        endpoint_url = "https://asap-pdf-document-inference-production-00d947a60db4c1e0d.7d67968.vpc-lattice-svcs.us-east-1.on.aws"
+      end
       payload = {
         model_name: "gemini-1.5-pro-latest",
         document_url: url,
