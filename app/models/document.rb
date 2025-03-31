@@ -33,6 +33,11 @@ class Document < ApplicationRecord
     where(document_category: category)
   }
 
+  scope :by_decision_type, ->(decision_type) {
+    return all if decision_type.blank?
+    where(accessibility_recommendation: decision_type)
+  }
+
   scope :by_date_range, ->(start_date, end_date) {
     scope = all
     scope = scope.where("modification_date >= ?", start_date) if start_date.present?
@@ -50,14 +55,19 @@ class Document < ApplicationRecord
 
   LEAVE_ACCESSIBILITY_RECOMMENDATION, REMEDIATE_ACCESSIBILITY_RECOMMENDATION = %w[Leave Remediate].freeze
 
-  DECISION_TYPES = [DEFAULT_ACCESSIBILITY_RECOMMENDATION, LEAVE_ACCESSIBILITY_RECOMMENDATION,
-    REMEDIATE_ACCESSIBILITY_RECOMMENDATION, "Convert", "Remove"].freeze
+  DECISION_TYPES = {
+    DEFAULT_ACCESSIBILITY_RECOMMENDATION.to_s => "Unknown",
+    LEAVE_ACCESSIBILITY_RECOMMENDATION.to_s => "Leave PDF as-is",
+    REMEDIATE_ACCESSIBILITY_RECOMMENDATION.to_s => "Remediate PDF",
+    "Convert" => "Convert PDF to web content",
+    "Remove" => "Remove PDF from website"
+  }.freeze
 
   validates :file_name, presence: true
   validates :url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp}
   validates :document_status, presence: true, inclusion: {in: %w[discovered downloaded]}
   validates :document_category, inclusion: {in: CONTENT_TYPES}, allow_nil: true
-  validates :accessibility_recommendation, inclusion: {in: DECISION_TYPES}, allow_nil: true
+  validates :accessibility_recommendation, inclusion: {in: DECISION_TYPES.keys}, allow_nil: true
 
   before_validation :set_defaults
 
@@ -145,10 +155,10 @@ class Document < ApplicationRecord
 
   def inference_summary!
     if summary.nil?
-      if Rails.env.to_s != "production"
-        endpoint_url = "http://localhost:9000/2015-03-31/functions/function/invocations"
+      endpoint_url = if Rails.env.to_s != "production"
+        "http://localhost:9000/2015-03-31/functions/function/invocations"
       else
-        endpoint_url = "https://asap-pdf-document-inference-production-00d947a60db4c1e0d.7d67968.vpc-lattice-svcs.us-east-1.on.aws"
+        "https://asap-pdf-document-inference-production-00d947a60db4c1e0d.7d67968.vpc-lattice-svcs.us-east-1.on.aws"
       end
       payload = {
         model_name: "gemini-1.5-pro-latest",
