@@ -74,6 +74,8 @@ def get_summary(model_name: str, api_key: str, attachments: list) -> str:
 def handler(event, context):
     try:
         logger.info(json.dumps(event))
+        if "body" in event:
+            event = event["body"]
         for required_key in ("model_name", "document_url", "page_limit"):
             if required_key not in event:
                 raise ValueError(
