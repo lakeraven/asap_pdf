@@ -153,7 +153,7 @@ jobs:
             TASK_ID=$(echo $TASK_ARN | awk -F'/' '{print $3}')
             aws logs get-log-events \
               --log-group-name /ecs/asap-pdf-production \
-              --log-stream-name app/$TASK_ID \
+              --log-stream-name /web/app/$TASK_ID \
               --limit 50 \
               --query 'events[*].message'
           else
