@@ -112,7 +112,7 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-          wait-for-minutes: 3
+          wait-for-minutes: 5
 
       - name: Debug deployment failure
         if: failure() && steps.deploy.outcome == 'failure'
