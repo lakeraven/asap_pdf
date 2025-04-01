@@ -243,7 +243,7 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = module.vpc.private_subnets
+  subnets            = module.vpc.public_subnets
 
   enable_deletion_protection = true
 
