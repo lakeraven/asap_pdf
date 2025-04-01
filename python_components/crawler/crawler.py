@@ -5,17 +5,19 @@ import re
 import time
 import urllib.parse
 import urllib.robotparser
-import warnings
+import logging
 from collections import defaultdict, deque
 
 import pandas as pd
 import pypdf
 import requests
+import tabula
 import tldextract
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-warnings.filterwarnings("ignore")
+logger = logging.getLogger("pypdf")
+logger.setLevel(logging.ERROR)
 
 
 def get_config(url):
@@ -25,7 +27,7 @@ def get_config(url):
     try:
         return config[url]
     except KeyError:
-        raise Exception('URL provided not in config.json')
+        raise Exception("URL provided not in config.json")
 
 
 def parse_robots_txt(url, manual_crawl_delay):
@@ -156,6 +158,16 @@ def convert_bytes(file_size):
     return f"{file_size:.1f}YB"
 
 
+def get_number_of_images(pages, min_width=100, min_height=100):
+    number_of_images = 0
+    for page in pages:
+        for image_file_object in page.images:
+            width, height = image_file_object.image.size
+            if (width > min_width) and (height > min_height):
+                number_of_images += 1
+    return number_of_images
+
+
 def get_pdf_metadata(pdfs):
     rows = []
     for pdf_url in tqdm(pdfs.keys(), ncols=100):
@@ -173,12 +185,17 @@ def get_pdf_metadata(pdfs):
                 with io.BytesIO(response.content) as mem_obj:
                     try:
                         pdf_file = pypdf.PdfReader(mem_obj, strict=True)
+                        tables = tabula.read_pdf(
+                            mem_obj, pages="all", stream=True, silent=True
+                        )
 
                         file_name = default_file_name
                         pdf_title = pdf_file.metadata.title
                         if pdf_title and (len(pdf_title.strip()) > 0):
                             file_name = pdf_title
                         file_bytes = mem_obj.getbuffer().nbytes
+                        number_of_tables = len(tables)
+                        number_of_images = get_number_of_images(pdf_file.pages)
 
                         row = {
                             "file_name": file_name,
@@ -192,6 +209,8 @@ def get_pdf_metadata(pdfs):
                             "creation_date": pdf_file.metadata.creation_date,
                             "producer": pdf_file.metadata.producer,
                             "number_of_pages": pdf_file.get_num_pages(),
+                            "number_of_tables": number_of_tables,
+                            "number_of_images": number_of_images,
                             "version": pdf_file.pdf_header,
                             "source": source,
                             "text_around_link": texts,
@@ -210,8 +229,7 @@ def get_pdf_metadata(pdfs):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Starts crawl from provided URL")
     parser.add_argument("url", help="Starting URL")
-    parser.add_argument(
-        "--delay", type=float, default=0, help="Delay between requests")
+    parser.add_argument("--delay", type=float, default=0, help="Delay between requests")
     parser.add_argument(
         "output_path", help="Path where a CSV with PDF information will be saved"
     )
