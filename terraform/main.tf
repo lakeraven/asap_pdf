@@ -1,3 +1,10 @@
+module "logging" {
+  source = "github.com/codeforamerica/tofu-modules-aws-logging?ref=2.1.0"
+
+  project     = var.project_name
+  environment = var.environment
+}
+
 # Networking
 module "networking" {
   source = "./modules/networking"
@@ -8,6 +15,7 @@ module "networking" {
   availability_zones   = ["us-east-1a", "us-east-1b"]
   public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
+  logging_key_id = module.logging.kms_key_arn
 }
 
 # Database

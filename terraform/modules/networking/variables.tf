@@ -36,3 +36,8 @@ variable "domain_name" {
   type        = string
   default     = "demo.codeforamerica.ai"
 }
+
+variable "logging_key_id" {
+  description = "KMS key id to encrypt logs."
+  type = string
+}
