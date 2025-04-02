@@ -155,10 +155,10 @@ class Document < ApplicationRecord
 
   def inference_summary!
     if summary.nil?
-      endpoint_url = if Rails.env.to_s != "production"
-        "http://localhost:9000/2015-03-31/functions/function/invocations"
+      lambda_manager = if Rails.env.to_s != "production"
+        AwsLambdaManager.new(function_url: "http://localhost:9000/2015-03-31/functions/function/invocations")
       else
-        "https://asap-pdf-document-inference-production-00d947a60db4c1e0d.7d67968.vpc-lattice-svcs.us-east-1.on.aws"
+        AwsLambdaManager.new(function_name: "asap-pdf-document-inference-production")
       end
       payload = {
         model_name: "gemini-1.5-pro-latest",
@@ -166,7 +166,7 @@ class Document < ApplicationRecord
         page_limit: 7
       }.to_json
       begin
-        response = RestClient.post(endpoint_url, payload, {content_type: :json, accept: :json})
+        response = lambda_manager.invoke_lambda!(payload)
         json_body = JSON.parse(response.body)
         if json_body["statusCode"] == 200
           self.summary = '"' + json_body["body"] + '"'

@@ -4,7 +4,7 @@ class ConfigurationsController < ApplicationController
 
   def initialize
     super
-    @secret_manager = AwsSecretManager.new
+    @secret_manager = AwsLocalSecretManager.new
   end
 
   def edit
