@@ -81,7 +81,7 @@ def handler(event, context):
             logger.info("Here it is:")
             logger.info(type(event["body"]))
             logger.info(event["body"])
-            event = event["body"]
+            event = json.loads(event["body"])
         event_type = type(event)
         logger.info(f"Final event: {event_type}")
         logger.info("Checking payload for required keys.")
