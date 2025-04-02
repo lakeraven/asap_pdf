@@ -73,23 +73,23 @@ def get_summary(model_name: str, api_key: str, attachments: list) -> str:
 
 def handler(event, context):
     try:
-        logger.info(event)
         if type(event) is str:
             event = json.loads(event)
-        logger.info('here is the intermediate event')
-        logger.info(event)
+        else:
+            raise RuntimeError("Event object is not a string. Unsure how to proceed.")
         if "body" in event:
             if type(event["body"]) is str:
                 event["body"] = json.loads(event["body"])
             event = event["body"]
-        logger.info('here is the final event')
-        logger.info(event)
+        logger.info("Checking payload for required keys.")
         for required_key in ("model_name", "document_url", "page_limit"):
             if required_key not in event:
                 raise ValueError(
                     f"Function called without required parameter, {required_key}."
                 )
+        logger.info("Required keys are present.")
         local_mode = os.environ.get("ASAP_LOCAL_MODE", False)
+        logger.info("Checking payload for supported model.")
         supported_models = get_models()
         if event["model_name"] not in supported_models.keys():
             supported_model_list = ",".join(supported_models.keys())
@@ -99,6 +99,8 @@ def handler(event, context):
         api_key = get_secret(
             supported_models[event["model_name"]]["key"], local_mode
         )
+        logger.info("Model is ok.")
+        event["page_limit"] = int(event["page_limit"])
         page_limit = (
             "unlimited" if event["page_limit"] == 0 else event["page_limit"]
         )
@@ -109,7 +111,6 @@ def handler(event, context):
             os.makedirs("/tmp/data")
         # Download file locally.
         local_path = get_file(event["document_url"], "/tmp/data")
-
         # Convert to images.
         logger.info("Converting to images!")
         attachments = pdf_to_attachments(local_path, "/tmp/data", event["page_limit"])
@@ -119,6 +120,7 @@ def handler(event, context):
         # Send images off to our friend.
         logger.info(f"Summarizing with {event['model_name']}...")
         summary = get_summary(event["model_name"], api_key, attachments)
+        logger.info("Summarization complete!")
     except Exception as e:
         return {
             "statusCode": 500,
