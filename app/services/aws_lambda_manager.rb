@@ -17,17 +17,12 @@ class AwsLambdaManager
     request_body = payload.to_json
     # Parse the URL
     uri = URI.parse(@function_url)
-
-    creds = Aws::Credentials.new(
-      ENV["AWS_ACCESS_KEY_ID"],
-      ENV["AWS_SECRET_ACCESS_KEY"],
-      ENV["AWS_SESSION_TOKEN"]
-    )
+    credentials_provider = Aws::CredentialProviderChain.new.resolve
     # Create a signing request
     signer = Aws::Sigv4::Signer.new(
       service: "lambda",
       region: @region,
-      credentials_provider: creds,
+      credentials_provider: credentials_provider,
     )
     # Sign the request
     signed_headers = signer.sign_request(

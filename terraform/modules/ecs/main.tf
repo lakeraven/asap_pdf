@@ -138,8 +138,8 @@ resource "aws_iam_role_policy" "ecs_task_exec_policy" {
   })
 }
 
-resource "aws_iam_role_policy" "ecs_lambda_invoke_policy" {
-  name = "${var.project_name}-${var.environment}-lambda-invoke-policy"
+resource "aws_iam_role_policy" "ecs_task_lambda_invoke_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-lambda-invoke-policy"
   role = aws_iam_role.ecs_task_role.id
   policy = jsonencode({
     Version = "2012-10-17"
