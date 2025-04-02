@@ -73,7 +73,8 @@ def get_summary(model_name: str, api_key: str, attachments: list) -> str:
 
 def handler(event, context):
     try:
-        logger.info(json.dumps(event))
+        if type(event) is str:
+            event = json.loads(event)
         if "body" in event:
             if type(event["body"]) is str:
                 event["body"] = json.loads(event["body"])
