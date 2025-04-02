@@ -76,10 +76,14 @@ def handler(event, context):
         logger.info(event)
         if type(event) is str:
             event = json.loads(event)
+        logger.info('here is the intermediate event')
+        logger.info(event)
         if "body" in event:
             if type(event["body"]) is str:
                 event["body"] = json.loads(event["body"])
             event = event["body"]
+        logger.info('here is the final event')
+        logger.info(event)
         for required_key in ("model_name", "document_url", "page_limit"):
             if required_key not in event:
                 raise ValueError(
