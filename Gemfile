@@ -54,6 +54,8 @@ end
 gem "bcrypt", "~> 3.1"
 gem "aws-sdk-s3", "~> 1.182"  # For S3 versioning support
 gem "aws-sdk-secretsmanager"
+gem "aws-sdk-lambda"
+gem "aws-sigv4"
 
 # API and Documentation
 gem "grape", "~> 2.3"
