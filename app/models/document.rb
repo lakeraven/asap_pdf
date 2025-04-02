@@ -175,9 +175,7 @@ class Document < ApplicationRecord
           body = response.body
           status = response.code
         end
-        p "here is status"
-        p status
-        if status == 200
+        if Integer(status) == 200
           self.summary = '"' + body + '"'
         else
           raise StandardError.new("Inference failed: #{body}")
