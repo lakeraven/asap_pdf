@@ -97,6 +97,9 @@ def handler(event, context):
         logger.info(f"Local mode: {local_mode}")
         logger.info("Checking payload for supported model.")
         supported_models = get_models()
+        logger.info("Here are model details:")
+        logger.info(event["model_name"])
+        logger.info(supported_models.keys())
         if event["model_name"] not in supported_models.keys():
             supported_model_list = ",".join(supported_models.keys())
             raise ValueError(
