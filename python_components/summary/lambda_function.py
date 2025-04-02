@@ -78,13 +78,8 @@ def handler(event, context):
         if type(event) is str:
             event = json.loads(event)
         if "body" in event:
-            logger.info(f"Event has a body key: {event}")
-            body_type = type(event["body"])
-            logger.info(f"Event body is type: {body_type}")
-            if isinstance(event["body"], str):
-                logging.info("Decoding event body.")
-                event["body"] = json.loads(event["body"])
-            event = event["body"]
+            logger.info(f"Event has a body key. Presuming json. Attempting to decode.")
+            event = json.loads(event["body"])
         event_type = type(event)
         logger.info(f"Final event: {event_type}")
         logger.info("Checking payload for required keys.")
