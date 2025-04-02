@@ -164,7 +164,7 @@ class Document < ApplicationRecord
         model_name: "gemini-1.5-pro-latest",
         document_url: url,
         page_limit: 7
-      }.to_json
+      }
       begin
         response = lambda_manager.invoke_lambda!(payload)
         begin
