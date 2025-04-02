@@ -22,7 +22,7 @@ class AwsLambdaManager
     signer = Aws::Sigv4::Signer.new(
       service: "lambda",
       region: @region,
-      credentials_provider: credentials_provider,
+      credentials_provider: credentials_provider
     )
     # Sign the request
     signed_headers = signer.sign_request(

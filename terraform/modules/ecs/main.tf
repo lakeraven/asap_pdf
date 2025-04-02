@@ -148,6 +148,7 @@ resource "aws_iam_role_policy" "ecs_task_lambda_invoke_policy" {
         Effect = "Allow"
         Action = [
           "lambda:InvokeFunction",
+          "lambda:InvokeFunctionUrl",
           "lambda:GetFunctionUrlConfig",
         ]
         Resource = "*"
