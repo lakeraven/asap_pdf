@@ -73,10 +73,10 @@ def get_summary(model_name: str, api_key: str, attachments: list) -> str:
 
 def handler(event, context):
     try:
+        event_type = type(event)
+        logger.info(f"Received event: {event_type}")
         if type(event) is str:
             event = json.loads(event)
-        else:
-            raise RuntimeError("Event object is not a string. Unsure how to proceed.")
         if "body" in event:
             if type(event["body"]) is str:
                 event["body"] = json.loads(event["body"])
