@@ -71,11 +71,11 @@ resource "aws_iam_role_policy" "ecs_task_cli_exec" {
     Version = "2012-10-17"
     Statement = [
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "ecs:ExecuteCommand"
         ],
-        "Resource": "*"
+        "Resource" : "*"
       },
       {
         Effect = "Allow"
@@ -118,11 +118,11 @@ resource "aws_iam_role_policy" "ecs_task_exec_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "ecs:ExecuteCommand"
         ],
-        "Resource": "*"
+        "Resource" : "*"
       },
       {
         Effect = "Allow"
@@ -138,15 +138,33 @@ resource "aws_iam_role_policy" "ecs_task_exec_policy" {
   })
 }
 
+resource "aws_iam_role_policy" "ecs_lambda_invoke_policy" {
+  name = "${var.project_name}-${var.environment}-lambda-invoke-policy"
+  role = aws_iam_role.ecs_task_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction",
+          "lambda:GetFunctionUrlConfig",
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # Task definition
 resource "aws_ecs_task_definition" "app" {
-  family                   = "${var.project_name}-${var.environment}-app"
-  network_mode             = "awsvpc"
+  family             = "${var.project_name}-${var.environment}-app"
+  network_mode       = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.container_cpu
-  memory                   = var.container_memory
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  cpu                = var.container_cpu
+  memory             = var.container_memory
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -167,7 +185,7 @@ resource "aws_ecs_task_definition" "app" {
           value = var.environment
         },
         {
-          name  = "PORT"
+          name = "PORT"
           value = tostring(var.container_port)
         },
         {
@@ -306,8 +324,10 @@ resource "aws_ecs_service" "app" {
   enable_execute_command = true
 
   network_configuration {
-    subnets          = var.subnet_ids
-    security_groups  = [var.security_group_id]
+    subnets = var.subnet_ids
+    security_groups = [
+      var.security_group_id
+    ]
     assign_public_ip = false
   }
 

@@ -1,5 +1,5 @@
 class AwsLambdaManager
-  def initialize(region: "us.east-1", function_name: nil, function_url: nil)
+  def initialize(region: "us-east-1", function_name: nil, function_url: nil)
     @region = region
     if function_name.nil? && function_url.nil?
       raise StandardError, "Lambda manager must be instantiated with either a function_name or function_url."
@@ -17,15 +17,17 @@ class AwsLambdaManager
     request_body = payload.to_json
     # Parse the URL
     uri = URI.parse(@function_url)
+
+    creds = Aws::Credentials.new(
+      ENV["AWS_ACCESS_KEY_ID"],
+      ENV["AWS_SECRET_ACCESS_KEY"],
+      ENV["AWS_SESSION_TOKEN"]
+    )
     # Create a signing request
     signer = Aws::Sigv4::Signer.new(
       service: "lambda",
       region: @region,
-      credentials_provider: Aws::Credentials.new(
-        ENV["AWS_ACCESS_KEY_ID"].nil? ? "none" : ENV["AWS_ACCESS_KEY_ID"],
-        ENV["AWS_SECRET_ACCESS_KEY"].nil? ? "none" : ENV["AWS_SECRET_ACCESS_KEY"],
-        ENV["AWS_SESSION_TOKEN"].nil? ? "none" : ENV["AWS_SESSION_TOKEN"]
-      )
+      credentials_provider: creds,
     )
     # Sign the request
     signed_headers = signer.sign_request(
