@@ -81,6 +81,8 @@ def handler(event, context):
             if type(event["body"]) is str:
                 event["body"] = json.loads(event["body"])
             event = event["body"]
+        event_type = type(event)
+        logger.info(f"Final event: {event_type}")
         logger.info("Checking payload for required keys.")
         for required_key in ("model_name", "document_url", "page_limit"):
             if required_key not in event:
@@ -89,6 +91,7 @@ def handler(event, context):
                 )
         logger.info("Required keys are present.")
         local_mode = os.environ.get("ASAP_LOCAL_MODE", False)
+        logger.info(f"Local mode: {local_mode}")
         logger.info("Checking payload for supported model.")
         supported_models = get_models()
         if event["model_name"] not in supported_models.keys():
@@ -96,10 +99,10 @@ def handler(event, context):
             raise ValueError(
                 f"Unsupported model: {event['model_name']}. Options are: {supported_model_list}"
             )
+        logger.info("Model is ok.")
         api_key = get_secret(
             supported_models[event["model_name"]]["key"], local_mode
         )
-        logger.info("Model is ok.")
         event["page_limit"] = int(event["page_limit"])
         page_limit = (
             "unlimited" if event["page_limit"] == 0 else event["page_limit"]
