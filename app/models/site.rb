@@ -5,8 +5,8 @@ class Site < ApplicationRecord
   validates :name, presence: true
   validates :location, presence: true
   validates :primary_url, presence: true
-  validates :primary_url, uniqueness: {scope: :user_id}
-  validates :name, uniqueness: {scope: [:location, :user_id]}
+  validates :primary_url, uniqueness: { scope: :user_id }
+  validates :name, uniqueness: { scope: [:location, :user_id] }
   validate :ensure_safe_url
 
   def website
@@ -33,91 +33,103 @@ class Site < ApplicationRecord
 
   def as_json(options = {})
     super.except("user_id", "created_at", "updated_at")
-      .merge("s3_endpoint" => s3_endpoint)
+         .merge("s3_endpoint" => s3_endpoint)
   end
 
   def discover_documents!(document_data)
-    created_or_updated = []
-    total_length = document_data.length
-    row_count = 1
-    document_data.each do |data|
-      print "\rProcessing document #{row_count}/#{total_length}\r"
+    return if document_data.empty?
+
+    # Process one document at a time to minimize memory footprint
+    document_data.each_with_index do |data, index|
       url = data[:url]
       modification_date = data[:modification_date]
 
-      existing_document = documents.find_by("url = ?", url)
+      # Find existing document - one query per document but minimal memory usage
+      existing_document = documents.find_by(url: url)
 
-      if existing_document
-        if existing_document.modification_date.to_i != modification_date.to_i
-          # Document has changed, reset statuses
-          existing_document.update! attributes_from(data).reverse_merge(
-            file_name: clean_string(data[:file_name]) || existing_document.file_name
-          )
-        end
-        created_or_updated << existing_document
-      else
-        begin
-          if (new_doc = documents.create!(attributes_from(data).reverse_merge(
-            file_name: clean_string(data[:file_name]) || File.basename(URI.parse(url).path)
-          )))
-            created_or_updated << new_doc
+      ActiveRecord::Base.transaction do
+        if existing_document
+          if existing_document.modification_date.to_i != modification_date.to_i
+            # Update individual document
+            existing_document.update!(
+              attributes_from(data).reverse_merge(
+                file_name: clean_string(data[:file_name]) || existing_document.file_name
+              )
+            )
           end
-        rescue ActiveRecord::RecordInvalid => e
-          puts "Skipping error: #{e.message}"
+        else
+          begin
+            file_name = clean_string(data[:file_name]) ||
+              (url ? File.basename(URI.parse(url).path) : "unknown")
+
+            documents.create!(attributes_from(data).reverse_merge(file_name: file_name))
+          rescue StandardError => e
+            puts "Error creating document: #{e.message} for URL: #{url}"
+          end
         end
       end
-      row_count += 1
+
+      # Force frequent garbage collection - every 5 documents
+      if index % 5 == 0
+        GC.start(full_mark: true, immediate_sweep: true)
+        ActiveRecord::Base.connection_pool.release_connection
+        puts "Memory usage: #{`ps -o rss= -p #{Process.pid}`.to_i / 1024} MB" if index % 100 == 0
+      end
+
+      # Clear references to help GC
+      data = nil
+      existing_document = nil
     end
-    # Clear inline message.
-    puts
-    created_or_updated
   end
 
-  def process_csv_documents(csv_content)
-    SmarterCSV.process(csv_content, {chunk_size: 5000}) do |chunk|
-      documents = []
-      skipped = 0
-      chunk.each do |row|
-        row = row.stringify_keys
-        # Encode URL while preserving basic URL structure
-        encoded_url = URI.encode_www_form_component(row["url"])
-          .gsub("%3A", ":") # Restore colons
-          .gsub("%2F", "/") # Restore forward slashes
+  def process_csv_documents(csv_path)
+    File.open(csv_path, 'r') do |file|
+      SmarterCSV.process(file, { chunk_size: 100 }) do |chunk|
+        documents = []
+        skipped = 0
+        chunk.each do |row|
+          row = row.stringify_keys
+          # Encode URL while preserving basic URL structure
+          encoded_url = URI.encode_www_form_component(row["url"])
+                           .gsub("%3A", ":") # Restore colons
+                           .gsub("%2F", "/") # Restore forward slashes
 
-        # Parse file size (remove KB suffix and convert to float)
-        file_size = row["file_size"]&.gsub("KB", "")&.strip&.to_f
+          # Parse file size (remove KB suffix and convert to float)
+          file_size = row["file_size"]&.gsub("KB", "")&.strip&.to_f
 
-        # Parse source from CSV - handle the ['url'] format
-        source = if row["source"]
-          # Extract URLs from the string
-          urls = row["source"].scan(/'([^']+)'/).flatten
-          urls.empty? ? nil : urls
+          # Parse source from CSV - handle the ['url'] format
+          source = if row["source"]
+                     # Extract URLs from the string
+                     urls = row["source"].scan(/'([^']+)'/).flatten
+                     urls.empty? ? nil : urls
+                   end
+          documents << {
+            url: encoded_url,
+            file_name: row["file_name"],
+            file_size: file_size,
+            author: row["author"],
+            subject: row["subject"],
+            pdf_version: row["version"],
+            keywords: row["keywords"],
+            creation_date: row["creation_date"],
+            modification_date: row["last_modified_date"],
+            producer: row["producer"],
+            source: source,
+            predicted_category: row["predicted_category"],
+            predicted_category_confidence: row["predicted_category_confidence"],
+            number_of_pages: row["number_of_pages"]&.to_i
+          }
+        rescue URI::InvalidURIError => e
+          puts "Skipping invalid URL: #{row["url"]}"
+          puts "Error: #{e.message}"
+          skipped += 1
         end
-        documents << {
-          url: encoded_url,
-          file_name: row["file_name"],
-          file_size: file_size,
-          author: row["author"],
-          subject: row["subject"],
-          pdf_version: row["version"],
-          keywords: row["keywords"],
-          creation_date: row["creation_date"],
-          modification_date: row["last_modified_date"],
-          producer: row["producer"],
-          source: source,
-          predicted_category: row["predicted_category"],
-          predicted_category_confidence: row["predicted_category_confidence"],
-          number_of_pages: row["number_of_pages"]&.to_i
-        }
-      rescue URI::InvalidURIError => e
-        puts "Skipping invalid URL: #{row["url"]}"
-        puts "Error: #{e.message}"
-        skipped += 1
-      end
 
-      created_docs = discover_documents!(documents)
-      puts "Created/Updated #{created_docs.size} documents for #{name}"
-      puts "Skipped #{skipped} documents due to invalid URLs" if skipped > 0
+        discover_documents!(documents)
+        documents = nil
+        chunk = nil
+        puts "Skipped #{skipped} documents due to invalid URLs" if skipped > 0
+      end
     end
   end
 

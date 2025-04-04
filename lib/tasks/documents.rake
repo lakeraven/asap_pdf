@@ -2,7 +2,8 @@ require "zip"
 
 namespace :documents do
   desc "Bootstrap"
-  task bootstrap: :environment do
+  task :bootstrap, [:file_name] => :environment do |t, args|
+
     admin = User.first
 
     # Create Salt Lake City site
@@ -42,7 +43,7 @@ namespace :documents do
 
     csv_manifest = {
       "georgia.csv" => ga,
-      "austin.csv" => austin,
+      #"austin.csv" => austin,
       "san_rafael.csv" => san_rafael,
       "salt_lake_city.csv" => slc
     }
@@ -51,7 +52,7 @@ namespace :documents do
       zipfile.each do |entry|
         if entry.file?
           file_name = entry.name.delete_prefix("site_documents/")
-          if csv_manifest.has_key?(file_name)
+          if csv_manifest.has_key?(file_name) && (args.file_name.nil? || (args.file_name == file_name))
             site = csv_manifest[file_name]
             puts "\nProcessing #{site.name} documents in #{entry.name}..."
             tmp_path = "/tmp/#{file_name}"
