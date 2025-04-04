@@ -3,7 +3,6 @@ require "zip"
 namespace :documents do
   desc "Bootstrap"
   task :bootstrap, [:file_name] => :environment do |t, args|
-
     admin = User.first
 
     # Create Salt Lake City site
@@ -43,7 +42,7 @@ namespace :documents do
 
     csv_manifest = {
       "georgia.csv" => ga,
-      #"austin.csv" => austin,
+      "austin.csv" => austin,
       "san_rafael.csv" => san_rafael,
       "salt_lake_city.csv" => slc
     }
