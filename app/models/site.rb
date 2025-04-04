@@ -5,8 +5,8 @@ class Site < ApplicationRecord
   validates :name, presence: true
   validates :location, presence: true
   validates :primary_url, presence: true
-  validates :primary_url, uniqueness: {scope: :user_id}
-  validates :name, uniqueness: {scope: [:location, :user_id]}
+  validates :primary_url, uniqueness: { scope: :user_id }
+  validates :name, uniqueness: { scope: [:location, :user_id] }
   validate :ensure_safe_url
 
   def website
@@ -33,7 +33,7 @@ class Site < ApplicationRecord
 
   def as_json(options = {})
     super.except("user_id", "created_at", "updated_at")
-      .merge("s3_endpoint" => s3_endpoint)
+         .merge("s3_endpoint" => s3_endpoint)
   end
 
   def discover_documents!(document_data)
@@ -74,49 +74,51 @@ class Site < ApplicationRecord
   end
 
   def process_csv_documents(csv_content)
-    documents = []
-    skipped = 0
-    csv = CSV.new(StringIO.new(csv_content), headers: true)
-    csv.each do |row|
-      # Encode URL while preserving basic URL structure
-      encoded_url = URI.encode_www_form_component(row["url"])
-        .gsub("%3A", ":")  # Restore colons
-        .gsub("%2F", "/")  # Restore forward slashes
+    SmarterCSV.process(csv_content, { :chunk_size => 5000 }) do |chunk|
+      documents = []
+      skipped = 0
+      chunk.each do |row|
+        row = row.stringify_keys
+        # Encode URL while preserving basic URL structure
+        encoded_url = URI.encode_www_form_component(row["url"])
+                         .gsub("%3A", ":") # Restore colons
+                         .gsub("%2F", "/") # Restore forward slashes
 
-      # Parse file size (remove KB suffix and convert to float)
-      file_size = row["file_size"]&.gsub("KB", "")&.strip&.to_f
+        # Parse file size (remove KB suffix and convert to float)
+        file_size = row["file_size"]&.gsub("KB", "")&.strip&.to_f
 
-      # Parse source from CSV - handle the ['url'] format
-      source = if row["source"]
-        # Extract URLs from the string
-        urls = row["source"].scan(/'([^']+)'/).flatten
-        urls.empty? ? nil : urls
+        # Parse source from CSV - handle the ['url'] format
+        source = if row["source"]
+                   # Extract URLs from the string
+                   urls = row["source"].scan(/'([^']+)'/).flatten
+                   urls.empty? ? nil : urls
+                 end
+        documents << {
+          url: encoded_url,
+          file_name: row["file_name"],
+          file_size: file_size,
+          author: row["author"],
+          subject: row["subject"],
+          pdf_version: row["version"],
+          keywords: row["keywords"],
+          creation_date: row["creation_date"],
+          modification_date: row["last_modified_date"],
+          producer: row["producer"],
+          source: source,
+          predicted_category: row["predicted_category"],
+          predicted_category_confidence: row["predicted_category_confidence"],
+          number_of_pages: row["number_of_pages"]&.to_i
+        }
+      rescue URI::InvalidURIError => e
+        puts "Skipping invalid URL: #{row["url"]}"
+        puts "Error: #{e.message}"
+        skipped += 1
       end
-      documents << {
-        url: encoded_url,
-        file_name: row["file_name"],
-        file_size: file_size,
-        author: row["author"],
-        subject: row["subject"],
-        pdf_version: row["version"],
-        keywords: row["keywords"],
-        creation_date: row["creation_date"],
-        modification_date: row["last_modified_date"],
-        producer: row["producer"],
-        source: source,
-        predicted_category: row["predicted_category"],
-        predicted_category_confidence: row["predicted_category_confidence"],
-        number_of_pages: row["number_of_pages"]&.to_i
-      }
-    rescue URI::InvalidURIError => e
-      puts "Skipping invalid URL: #{row["url"]}"
-      puts "Error: #{e.message}"
-      skipped += 1
-    end
 
-    created_docs = discover_documents!(documents)
-    puts "Created/Updated #{created_docs.size} documents for #{name}"
-    puts "Skipped #{skipped} documents due to invalid URLs" if skipped > 0
+      created_docs = discover_documents!(documents)
+      puts "Created/Updated #{created_docs.size} documents for #{name}"
+      puts "Skipped #{skipped} documents due to invalid URLs" if skipped > 0
+    end
   end
 
   private

@@ -53,8 +53,11 @@ namespace :documents do
           file_name = entry.name.delete_prefix("site_documents/")
           if csv_manifest.has_key?(file_name)
             site = csv_manifest[file_name]
-            puts "\nProcessing #{site.name} documents..."
-            site.process_csv_documents(entry.get_input_stream.read)
+            puts "\nProcessing #{site.name} documents in #{entry.name}..."
+            tmp_path = "/tmp/#{file_name}"
+            entry.extract(tmp_path) unless File.exist?(tmp_path)
+            site.process_csv_documents(tmp_path)
+            File.delete(tmp_path) if File.exist? tmp_path
           end
         end
       end
