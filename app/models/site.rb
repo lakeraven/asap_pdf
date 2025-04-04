@@ -5,8 +5,8 @@ class Site < ApplicationRecord
   validates :name, presence: true
   validates :location, presence: true
   validates :primary_url, presence: true
-  validates :primary_url, uniqueness: { scope: :user_id }
-  validates :name, uniqueness: { scope: [:location, :user_id] }
+  validates :primary_url, uniqueness: {scope: :user_id}
+  validates :name, uniqueness: {scope: [:location, :user_id]}
   validate :ensure_safe_url
 
   def website
@@ -33,7 +33,7 @@ class Site < ApplicationRecord
 
   def as_json(options = {})
     super.except("user_id", "created_at", "updated_at")
-         .merge("s3_endpoint" => s3_endpoint)
+      .merge("s3_endpoint" => s3_endpoint)
   end
 
   def discover_documents!(document_data)
@@ -74,25 +74,25 @@ class Site < ApplicationRecord
   end
 
   def process_csv_documents(csv_content)
-    SmarterCSV.process(csv_content, { :chunk_size => 5000 }) do |chunk|
+    SmarterCSV.process(csv_content, {chunk_size: 5000}) do |chunk|
       documents = []
       skipped = 0
       chunk.each do |row|
         row = row.stringify_keys
         # Encode URL while preserving basic URL structure
         encoded_url = URI.encode_www_form_component(row["url"])
-                         .gsub("%3A", ":") # Restore colons
-                         .gsub("%2F", "/") # Restore forward slashes
+          .gsub("%3A", ":") # Restore colons
+          .gsub("%2F", "/") # Restore forward slashes
 
         # Parse file size (remove KB suffix and convert to float)
         file_size = row["file_size"]&.gsub("KB", "")&.strip&.to_f
 
         # Parse source from CSV - handle the ['url'] format
         source = if row["source"]
-                   # Extract URLs from the string
-                   urls = row["source"].scan(/'([^']+)'/).flatten
-                   urls.empty? ? nil : urls
-                 end
+          # Extract URLs from the string
+          urls = row["source"].scan(/'([^']+)'/).flatten
+          urls.empty? ? nil : urls
+        end
         documents << {
           url: encoded_url,
           file_name: row["file_name"],
