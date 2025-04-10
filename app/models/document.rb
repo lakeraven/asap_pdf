@@ -165,7 +165,7 @@ class Document < ApplicationRecord
         api_host = "http://host.docker.internal:3000"
       else
         lambda_manager = AwsLambdaManager.new(function_name: "asap-pdf-document-inference-production")
-        api_host = "http://demo.codeforamerica.ai"
+        api_host = "https://demo.codeforamerica.ai"
       end
       payload = {
         model_name: "gemini-1.5-pro-latest",
@@ -198,7 +198,7 @@ class Document < ApplicationRecord
         api_host = "http://host.docker.internal:3000"
       else
         lambda_manager = AwsLambdaManager.new(function_name: "asap-pdf-document-inference-production")
-        api_host = "http://demo.codeforamerica.ai"
+        api_host = "https://demo.codeforamerica.ai"
       end
       payload = {
         model_name: "gemini-2.0-pro-exp-02-05",
