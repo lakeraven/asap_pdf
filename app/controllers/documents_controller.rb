@@ -27,6 +27,22 @@ class DocumentsController < AuthenticatedController
     @status_values = Document::STATUSES.reject { |a| a == (params[:status].present? ? params[:status] : Document::DEFAULT_STATUS) }
   end
 
+  def serve_document_url
+    # Make the GET request to retrieve the PDF
+    response = RestClient.get(@document.url)
+    # Set appropriate headers to display in iframe instead of downloading
+    send_data response.body,
+      type: "application/pdf",
+      disposition: "inline; filename=\"#{@document.file_name}\"",
+      filename: @document.file_name
+  rescue RestClient::Exception => e
+    Rails.logger.error("PDF fetch error: #{e.message}")
+    render plain: "Failed to retrieve the PDF document: #{e.message}", status: e.http_code || 500
+  rescue => e
+    Rails.logger.error("General error: #{e.message}")
+    render plain: "An error occurred: #{e.message}", status: 500
+  end
+
   def update_document_category
     value = params[:value].presence
     if @document.update(document_category: value)
