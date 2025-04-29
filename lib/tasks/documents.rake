@@ -36,22 +36,57 @@ namespace :documents do
     )
     puts "Created site: #{ga.name}"
 
+    ga_dor = Site.find_or_create_by!(
+      name: "Department of Revenue",
+      location: "Georgia",
+      primary_url: "https://dor.georgia.gov"
+    )
+    puts "Created site: #{ga_dor.name}"
+
+    ga_dbf = Site.find_or_create_by!(
+      name: "Department of Banking and Finance",
+      location: "Georgia",
+      primary_url: "https://dbf.georgia.gov"
+    )
+    puts "Created site: #{ga_dbf.name}"
+
+    ga_psg = Site.find_or_create_by!(
+      name: "Enterprise Policies, Standards and Guidelines (PSGs)",
+      location: "Georgia",
+      primary_url: "https://gta-psg.georgia.gov"
+    )
+    puts "Created site: #{ga_psg.name}"
+
+    ga_dfcs = Site.find_or_create_by!(
+      name: "Department of Human Services Division of Family & Children Services",
+      location: "Georgia",
+      primary_url: "https://dfcs.georgia.gov"
+    )
+    puts "Created site: #{ga_dfcs.name}"
+
     csv_manifest = {
       "georgia.csv" => ga,
+      "dor_georgia.csv" => ga_dor,
+      "dbf_georgia.csv" => ga_dbf,
+      "gta_psg_georgia.csv" => ga_psg,
+      "dfcs_georgia.csv" => ga_dfcs,
       "austin.csv" => austin,
       "san_rafael.csv" => san_rafael,
       "salt_lake_city.csv" => slc
     }
 
-    Zip::File.open(Rails.root.join("db", "seeds", "site_documents.zip")) do |zipfile|
+    archive_name = (Rails.env != "production") ? "site_documents_dev.zip" : "site_documents.zip"
+    puts "Loading site data from #{archive_name}"
+
+    Zip::File.open(Rails.root.join("db", "seeds", archive_name)) do |zipfile|
       zipfile.each do |entry|
         if entry.file?
-          file_name = entry.name.delete_prefix("site_documents/")
+          file_name = entry.name.delete_prefix("site_documents/").delete_prefix("site_documents_dev/")
           if csv_manifest.has_key?(file_name) && (args.file_name.nil? || (args.file_name == file_name))
             site = csv_manifest[file_name]
             puts "\nProcessing #{site.name} documents in #{entry.name}..."
             tmp_path = "/tmp/#{file_name}"
-            entry.extract(tmp_path) unless File.exist?(tmp_path)
+            entry.extract(tmp_path)
             site.process_csv_documents(tmp_path)
             File.delete(tmp_path) if File.exist? tmp_path
           end
@@ -96,6 +131,21 @@ namespace :documents do
   task update_decision_type: :environment do
     Document.where(accessibility_recommendation: "Unknown").each do |document|
       document.accessibility_recommendation = Document::DEFAULT_ACCESSIBILITY_RECOMMENDATION
+      document.save
+    end
+  end
+
+  desc "Update statuses."
+  task update_statuses: :environment do
+    Document.find_each do |document|
+      document.status = case document.status
+      when "in_review"
+        Document::IN_REVIEW_STATUS
+      when "done"
+        Document::DONE_STATUS
+      else
+        Document::DEFAULT_STATUS
+      end
       document.save
     end
   end
