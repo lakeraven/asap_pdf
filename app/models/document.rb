@@ -46,15 +46,17 @@ class Document < ApplicationRecord
     end
   }
 
-  DEFAULT_STATUS = "Backlog".freeze
+  DEFAULT_STATUS = "Audit Backlog".freeze
   IN_REVIEW_STATUS = "In Review".freeze
-  DONE_STATUS = "Done".freeze
+  DONE_STATUS = "Audit Done".freeze
 
   STATUSES = [DEFAULT_STATUS, IN_REVIEW_STATUS, DONE_STATUS].freeze
 
   CONTENT_TYPES = %w[Agreement Agenda Brochure Diagram Flyer Form Job Letter Policy Slides Press Procurement Notice Report Spreadsheet].freeze
 
   DEFAULT_ACCESSIBILITY_RECOMMENDATION, LEAVE_ACCESSIBILITY_RECOMMENDATION, REMEDIATE_ACCESSIBILITY_RECOMMENDATION = %w[Needs\ Decision Leave Remediate].freeze
+
+  AI_SUGGESTION_EXCEPTION, AI_SUGGESTION_NO_EXCEPTION = %w[Might\ be\ exception Likely\ not\ exception]
 
   DECISION_TYPES = {
     DEFAULT_ACCESSIBILITY_RECOMMENDATION.to_s => "Needs Decision",
@@ -100,9 +102,9 @@ class Document < ApplicationRecord
     if document_inferences.any?
       exceptions = self.exceptions
       if exceptions.any?
-        LEAVE_ACCESSIBILITY_RECOMMENDATION
+        AI_SUGGESTION_EXCEPTION
       else
-        REMEDIATE_ACCESSIBILITY_RECOMMENDATION
+        AI_SUGGESTION_NO_EXCEPTION
       end
     end
   end

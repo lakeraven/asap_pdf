@@ -23,7 +23,7 @@ class DocumentsController < AuthenticatedController
       .order(sort_column => sort_direction)
       .page(params[:page])
     @document_categories = Document::CONTENT_TYPES
-    @document_decisions = Document::DECISION_TYPES.keys
+    @document_decisions = {"All Decisions": ""}.merge(Document::DECISION_TYPES.invert)
     @document_departments = @site.documents.pluck(:department).uniq.sort { |a, b|
       if a && b
         a <=> b
