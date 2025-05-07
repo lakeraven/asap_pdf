@@ -1,7 +1,7 @@
 class SitesController < AuthenticatedController
   include Access
-  before_action :find_site, only: [:show, :edit, :update, :destroy]
-  before_action :ensure_user_site_access, only: [:show, :edit, :update, :destroy]
+  before_action :find_site, only: [:insights, :show, :edit, :update, :destroy]
+  before_action :ensure_user_site_access, only: [:insights, :show, :edit, :update, :destroy]
 
   def index
     @sites = if Current.user.is_admin?
@@ -9,6 +9,14 @@ class SitesController < AuthenticatedController
     else
       Current.user.site.nil? ? [] : [Current.user.site]
     end
+  end
+
+  def insights
+    @documents = @site.documents
+    year_groups = @documents.group_by(&:creation_year).map { |label, year_documents| [label, year_documents.size] }
+    year_groups = year_groups.select { | item | item[0] == "Unknown" || Integer(item[0]) > 1990}
+    year_groups = year_groups.sort {|a, b|  a[0] <=> b[0]}
+    @document_years = year_groups
   end
 
   def show

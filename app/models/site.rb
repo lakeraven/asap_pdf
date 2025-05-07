@@ -124,7 +124,8 @@ class Site < ApplicationRecord
             predicted_category_confidence: row["predicted_category_confidence"],
             number_of_pages: row["number_of_pages"]&.to_i,
             number_of_tables: row["number_of_tables"]&.to_i,
-            number_of_images: row["number_of_images"]&.to_i
+            number_of_images: row["number_of_images"]&.to_i,
+            complexity: Document::COMPLEXITY_TYPES.detect{ rand(2) == 0 } || Document::COMPLEXITY_TYPES.last
           }
         rescue URI::InvalidURIError => e
           puts "Skipping invalid URL: #{row["url"]}"
@@ -162,7 +163,8 @@ class Site < ApplicationRecord
       number_of_pages: data[:number_of_pages],
       number_of_tables: data[:number_of_tables],
       number_of_images: data[:number_of_images],
-      document_status: "discovered"
+      document_status: "discovered",
+      complexity: data[:complexity],
     }
   end
 

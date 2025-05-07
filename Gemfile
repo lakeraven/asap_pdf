@@ -12,6 +12,8 @@ gem "csv"
 gem "httpparty"
 gem "rubyzip"
 gem "smarter_csv"
+gem "chartkick"
+gem "groupdate"
 
 gem "tzinfo-data", platforms: %i[windows jruby]
 

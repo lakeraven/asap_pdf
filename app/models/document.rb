@@ -58,14 +58,25 @@ class Document < ApplicationRecord
     "Remove" => "Remove PDF from website"
   }.freeze
 
+  COMPLEXITY_TYPES = %w[Low High].freeze
+
   validates :file_name, presence: true
   validates :url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp}
   validates :document_status, presence: true, inclusion: {in: %w[discovered downloaded]}
   validates :document_category, inclusion: {in: CONTENT_TYPES}
   validates :accessibility_recommendation, inclusion: {in: DECISION_TYPES.keys}, allow_nil: true
   validates :status, inclusion: {in: STATUSES}, presence: true
+  validates :complexity, inclusion: {in: COMPLEXITY_TYPES}, allow_nil: true
 
   before_validation :set_defaults
+
+  def creation_year
+    if creation_date.present?
+      creation_date.strftime("%Y")
+    else
+      "Unknown"
+    end
+  end
 
   def summary
     summary = document_inferences.find_by(inference_type: "summary")

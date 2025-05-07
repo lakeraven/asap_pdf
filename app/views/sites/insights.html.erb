@@ -1,0 +1,60 @@
+<% content_for :head do %>
+  <%= tag.meta name: "site-id", content: @site.id %>
+<% end %>
+<div class="py-6">
+  <div class="mx-auto sm:px-6 lg:px-8">
+    <div class="grid grid-cols-[250px_1fr] gap-6">
+      <div id="sidebar" class="space-y-6">
+        <div class="bg-white shadow-sm rounded-lg h-fit">
+
+        </div>
+      </div>
+      <div id="insights" class="px-4 sm:px-0 space-y-0">
+        <div class="bg-gray-50 shadow-sm rounded-t-lg px-6 py-4  border-b-gray-200 border-b">
+          <div class="flex justify-between items-center">
+            <h1 class="text-lg font-medium"><%= @site.location %>: <%= @site.name %></h1>
+          </div>
+        </div>
+        <div class="bg-white shadow-sm rounded-b-lg overflow-visible">
+          <div class="grid grid-cols-3 gap-6 py-4">
+            <div class="px-4 border-r-4 border-base-200">
+              <h2>Document Complexity</h2>
+              <%= pie_chart @documents.group(:complexity).count %>
+              <div class="dropdown dropdown-start">
+                <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                  <li><a href="#">High Complexity</a></li>
+                  <li><a href="#">Low Complexity</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="px-4">
+              <h2>Document Creation Year</h2>
+              <%= bar_chart @document_years, library: { scales: { y: { ticks: { autoSkip: false } } } } %>
+              <div class="dropdown dropdown-start">
+                <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-96 p-2 shadow-sm max-h-40">
+                  <% @document_years.each do | item | %>
+                    <li><a href="#"><%= item[0] %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+            <div class="px-4 border-l-4 border-base-200">
+              <h2>Decision</h2>
+              <%= column_chart @documents.group(:accessibility_recommendation).count %>
+              <div class="dropdown dropdown-start">
+                <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
+                <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                  <% Document::DECISION_TYPES.each do | key, value | %>
+                    <li><a href="#"><%= value %></a></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
