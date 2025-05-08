@@ -84,13 +84,13 @@ GEM
       base64
       jmespath (~> 1, >= 1.6.1)
       logger
-    aws-sdk-kms (1.99.0)
+    aws-sdk-kms (1.100.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
     aws-sdk-lambda (1.150.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-s3 (1.184.0)
+    aws-sdk-s3 (1.185.0)
       aws-sdk-core (~> 3, >= 3.216.0)
       aws-sdk-kms (~> 1)
       aws-sigv4 (~> 1.5)
@@ -496,7 +496,7 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk-lambda
-  aws-sdk-s3 (~> 1.184)
+  aws-sdk-s3 (~> 1.185)
   aws-sdk-secretsmanager
   aws-sigv4
   bcrypt (~> 3.1)
