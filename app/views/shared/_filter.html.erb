@@ -40,13 +40,13 @@
                          options_for_select(@document_decisions, params[:accessibility_recommendation]),
                          class: "select-custom w-full" %>
         </div>
-        <% if show_departments_filter %>
+        <% if site.has_departments? %>
           <div>
             <label class="label">
               <span class="label-text">Department</span>
             </label>
             <%= select_tag :department,
-                           options_for_select({'All Departments': ''}.merge(document_departments), params[:department]),
+                           options_for_select({'All Departments': ''}.merge(site.get_departments), params[:department]),
                            class: "select-custom w-full" %>
           </div>
         <% end %>

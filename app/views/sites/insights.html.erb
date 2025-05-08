@@ -6,20 +6,64 @@
     <div class="grid grid-cols-[250px_1fr] gap-6">
       <div id="sidebar" class="space-y-6">
         <div class="bg-white shadow-sm rounded-lg h-fit">
-
+          <div class="border-b">
+            <h2 class="text-gray-600 font-semibold text-sm w-full flex justify-between items-center px-4 py-4">Filter View</h2>
+          </div>
+          <%= form_tag site_documents_path(@site), method: :get, class: "px-4 py-4", data: { action: "submit->filter#submitForm" } do %>
+            <div>
+              <label class="label">
+                <span class="label-text">Document Type</span>
+              </label>
+              <%= select_tag :category,
+                             options_for_select([['All Types', '']] + Document::CONTENT_TYPES.map { |c| [c.to_s.titleize, c] }, params[:category]),
+                             class: "select-custom w-full" %>
+            </div>
+            <% if @site.has_departments? %>
+              <div>
+                <label class="label">
+                  <span class="label-text">Department</span>
+                </label>
+                <%= select_tag :department,
+                               options_for_select({'All Departments': ''}.merge(@site.get_departments), params[:department]),
+                               class: "select-custom w-full" %>
+              </div>
+            <% end %>
+            <div>
+              <label class="label">
+                <span class="label-text">Audit Status</span>
+              </label>
+              <%= select_tag :department,
+                             options_for_select({'All Statuses': ''}.merge(Document::STATUSES.map {|item| [item, item]}.to_h), params[:status]),
+                             class: "select-custom w-full" %>
+            </div>
+            <div class="flex justify-end pt-4">
+              <div>
+                <%= link_to 'Clear', site_documents_path(@site), class: "btn btn-sm btn-ghost", data: { action: "filter#clearFilters" } %>
+                <%= submit_tag 'Apply Filters', class: "btn btn-sm btn-primary" %>
+              </div>
+            </div>
+          <% end %>
         </div>
       </div>
       <div id="insights" class="px-4 sm:px-0 space-y-0">
         <div class="bg-gray-50 shadow-sm rounded-t-lg px-6 py-4  border-b-gray-200 border-b">
           <div class="flex justify-between items-center">
             <h1 class="text-lg font-medium"><%= @site.location %>: <%= @site.name %></h1>
+            <div role="tablist" class="tabs tabs-boxed">
+              <%= link_to site_documents_path(@site), role: "tab", class: "tab" do %>
+                Documents
+              <% end %>
+              <%= link_to insights_site_path(@site), role: "tab", class: "tab tab-active" do %>
+                Insights
+              <% end %>
+            </div>
           </div>
         </div>
         <div class="bg-white shadow-sm rounded-b-lg overflow-visible">
           <div class="grid grid-cols-3 gap-6 py-4">
             <div class="px-4 border-r-4 border-base-200">
               <h2>Document Complexity</h2>
-              <%= pie_chart @documents.group(:complexity).count %>
+              <%= pie_chart @documents.group(:complexity).count, colors: ["#2b1a78", "#7b65de"] %>
               <div class="dropdown dropdown-start">
                 <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
                 <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
@@ -30,11 +74,11 @@
             </div>
             <div class="px-4">
               <h2>Document Creation Year</h2>
-              <%= bar_chart @document_years, library: { scales: { y: { ticks: { autoSkip: false } } } } %>
+              <%= bar_chart @document_years, library: { scales: { y: { ticks: { autoSkip: false } } } }, colors: ["#7b65de"] %>
               <div class="dropdown dropdown-start">
                 <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
                 <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-96 p-2 shadow-sm max-h-40">
-                  <% @document_years.each do | item | %>
+                  <% @document_years.each do |item| %>
                     <li><a href="#"><%= item[0] %></a></li>
                   <% end %>
                 </ul>
@@ -42,11 +86,11 @@
             </div>
             <div class="px-4 border-l-4 border-base-200">
               <h2>Decision</h2>
-              <%= column_chart @documents.group(:accessibility_recommendation).count %>
+              <%= column_chart @documents.group(:accessibility_recommendation).count, colors: ["#2b1a78", "#48474b"] %>
               <div class="dropdown dropdown-start">
                 <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
                 <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                  <% Document::DECISION_TYPES.each do | key, value | %>
+                  <% Document::DECISION_TYPES.each do |key, value| %>
                     <li><a href="#"><%= value %></a></li>
                   <% end %>
                 </ul>
