@@ -169,6 +169,7 @@ class Site < ApplicationRecord
             urls = row["source"].scan(/'([^']+)'/).flatten
             urls.empty? ? nil : urls
           end
+
           documents << {
             url: encoded_url,
             file_name: row["file_name"],

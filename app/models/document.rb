@@ -31,6 +31,12 @@ class Document < ApplicationRecord
     where(department: department)
   }
 
+  scope :by_complexity, ->(complexity) {
+    return all if complexity.blank?
+    complexity = (complexity == "None") ? [nil, ""] : complexity
+    where(complexity: complexity)
+  }
+
   scope :by_date_range, ->(start_date, end_date) {
     scope = all
     scope = scope.where("modification_date >= ?", start_date) if start_date.present?
@@ -66,7 +72,10 @@ class Document < ApplicationRecord
     "Remove" => "Remove PDF from website"
   }.freeze
 
-  COMPLEXITY_TYPES = %w[Low High].freeze
+  SIMPLE_STATUS = "Simple".freeze
+  COMPLEX_STATUS = "Complex".freeze
+
+  COMPLEXITIES = [SIMPLE_STATUS, COMPLEX_STATUS].freeze
 
   validates :file_name, presence: true
   validates :url, presence: true, format: {with: URI::DEFAULT_PARSER.make_regexp}
