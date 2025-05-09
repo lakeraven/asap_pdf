@@ -181,8 +181,6 @@ GEM
     grape-swagger (2.1.2)
       grape (>= 1.7, < 3.0)
       rack-test (~> 2)
-    groupdate (6.6.0)
-      activesupport (>= 7.1)
     httparty (0.23.1)
       csv
       mini_mime (>= 1.0.0)
@@ -517,7 +515,6 @@ DEPENDENCIES
   factory_bot_rails (~> 6.4)
   grape (~> 2.3)
   grape-swagger
-  groupdate
   httpparty
   jsbundling-rails
   kaminari (~> 1.2)
