@@ -224,7 +224,7 @@ class Site < ApplicationRecord
       number_of_pages: data[:number_of_pages],
       number_of_tables: data[:number_of_tables],
       number_of_images: data[:number_of_images],
-      document_status: "discovered",
+      document_status: "discovered"
     }
   end
 

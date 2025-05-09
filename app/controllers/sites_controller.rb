@@ -13,8 +13,8 @@ class SitesController < AuthenticatedController
 
   def insights
     @documents = @site.documents
-                   .by_category(params[:category])
-                   .by_department(params[:department])
+      .by_category(params[:category])
+      .by_department(params[:department])
     if params[:status].present?
       @documents.by_status(params[:status])
     end
@@ -25,13 +25,14 @@ class SitesController < AuthenticatedController
     unknown_group = year_groups.find { |item| item[0] == "Unknown" }
     year_groups = year_groups.reject { |item| item[0] == "Unknown" }
     year_groups = year_groups.select do |item|
-      begin
-        Integer(item[0])
-        true
-      rescue
-        unknown_group[1] += 1
-        false
+      Integer(item[0])
+      true
+    rescue
+      if unknown_group.nil?
+        unknown_group = ["Unknown", 0]
       end
+      unknown_group[1] += 1
+      false
     end
     # Convert to integers for sorting and calculations
     year_groups = year_groups.map { |year, count| [Integer(year), count] }
@@ -46,16 +47,16 @@ class SitesController < AuthenticatedController
       ["> 2023", 2024..Float::INFINITY]
     ]
     bins.each do |label, range|
-      count = year_groups.select { |year, _| range.include?(year) }.sum { |_, count| count }
+      count = year_groups.filter_map { |year, count| count if range.cover?(year) }.sum
       binned_data << [label, count]
     end
     # Add the "Unknown" group if it exists (placing it at the end)
     binned_data << unknown_group if unknown_group
     @document_years = binned_data
     # Create table data.
-    default_group = Document::STATUSES.map {  |status| [status, 0] }.to_h
+    default_group = Document::STATUSES.map { |status| [status, 0] }.to_h
     @category_groups = {}
-    @documents.group([:document_category, :status]).count.each do | groups, group_count |
+    @documents.group([:document_category, :status]).count.each do |groups, group_count|
       @category_groups[groups[0]] = default_group.clone if @category_groups[groups[0]].nil?
       @category_groups[groups[0]][groups[1]] = group_count
     end
@@ -66,17 +67,17 @@ class SitesController < AuthenticatedController
     @category_groups = @category_groups.sort.to_h
     # Work on document links.
     @document_links = {
-      "complexity": [
-        {"title": Document::SIMPLE_STATUS, "params": query_params.merge({"complexity": Document::SIMPLE_STATUS})},
-        {"title": Document::COMPLEX_STATUS, "params": query_params.merge({"complexity": Document::COMPLEX_STATUS})}
+      complexity: [
+        {title: Document::SIMPLE_STATUS, params: query_params.merge({complexity: Document::SIMPLE_STATUS})},
+        {title: Document::COMPLEX_STATUS, params: query_params.merge({complexity: Document::COMPLEX_STATUS})}
       ],
-      "years": bins.map do |label, range|
-        document_count = @document_years.select {|item| item[0] == label}.first
+      years: bins.map do |label, range|
+        document_count = @document_years.find { |item| item[0] == label }
         if document_count[1] == 0
           next
         end
-        start_date = range.begin == -Float::INFINITY ? nil : "#{range.begin}-01-01"
-        end_date = range.end == Float::INFINITY ? nil : "#{range.end}-12-31"
+        start_date = (range.begin == -Float::INFINITY) ? nil : "#{range.begin}-01-01"
+        end_date = (range.end == Float::INFINITY) ? nil : "#{range.end}-12-31"
         {
           title: label,
           params: query_params.merge(
@@ -85,11 +86,11 @@ class SitesController < AuthenticatedController
           ).compact
         }
       end.compact,
-      "decision": @documents.pluck(:accessibility_recommendation).uniq.map do | decision |
+      decision: @documents.pluck(:accessibility_recommendation).uniq.map do |decision|
         {
           title: decision,
           params: query_params.merge(
-            accessibility_recommendation: decision,
+            accessibility_recommendation: decision
           )
         }
       end
