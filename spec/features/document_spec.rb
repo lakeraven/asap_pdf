@@ -377,7 +377,8 @@ describe "documents function as expected", js: true, type: :feature do
       department: "Public Transportation",
       complexity: "Simple",
       site: site,
-      creation_date: "2022-10-01")
+      creation_date: "2022-10-01",
+      modification_date:  "2022-10-01")
     Document.create(url: "https://bouldercolorado.gov/docs/teahouse_rules.pdf",
       file_name: "teahouse_rules.pdf",
       document_category: "Notice",
@@ -386,7 +387,8 @@ describe "documents function as expected", js: true, type: :feature do
       department: "The Earl Gray Team",
       complexity: "Complex",
       site: site,
-      creation_date: "2022-10-01")
+      creation_date: "2022-10-01",
+      modification_date:  "2023-10-01")
     Document.create(url: "https://bouldercolorado.gov/docs/farmers_market_2023.pdf",
       file_name: "farmers_market_2023.pdf",
       document_category: "Notice",
@@ -406,7 +408,7 @@ describe "documents function as expected", js: true, type: :feature do
     within("#insights") do
       expect(page).to have_content "Colorado: City of Boulder"
       expect(page).to have_content "Document Complexity"
-      expect(page).to have_content "Document Creation Year"
+      expect(page).to have_content "Document Last Modified Year"
       expect(page).to have_content "Decision"
       expect(page).to have_content "\nTYPE AUDIT BACKLOG IN REVIEW AUDIT DONE TOTAL\nAgreement 1 0 0 1\nNotice 2 0 0 2"
     end
@@ -435,7 +437,7 @@ describe "documents function as expected", js: true, type: :feature do
     sleep(1)
     assert_match "sites/#{site.id}/documents?category=Agreement&commit=Apply+Filters&complexity=Complex&department=Public+Transportation&status=Audit+Backlog", current_url
     visit "/sites/#{site.id}/insights?category=Agreement&department=Public+Transportation&status=Audit+Backlog"
-    within("#insights #chart-creation-year") do
+    within("#insights #chart-modification-year") do
       find(".dropdown .btn").click
       click_link "2018-2023"
     end
