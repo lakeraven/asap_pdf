@@ -25,8 +25,7 @@ class DocumentsController < AuthenticatedController
       .page(params[:page])
     @document_categories = Document::CONTENT_TYPES
     @document_decisions = {"All Decisions": ""}.merge(Document::DECISION_TYPES.invert)
-    @document_complexities = Document::COMPLEXITIES
-    @show_complexities_filter = @site.documents.where.not(complexity: [nil, ""]).any?
+    @document_complexities = Document::COMPLEXITIES.map { |c| [c.to_s.titleize, c] }
     @total_documents = @documents.total_count
     @status_values = Document::STATUSES.reject { |a| a == (params[:status].present? ? params[:status] : Document::DEFAULT_STATUS) }
   end

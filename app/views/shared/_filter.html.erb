@@ -50,13 +50,13 @@
                            class: "select-custom w-full" + (params[:department].present? ? " active-highlight" : "") %>
           </div>
         <% end %>
-        <% if show_complexities_filter %>
+        <% if site.has_complexities? %>
           <div>
             <label class="label">
               <span class="label-text">Complexity</span>
             </label>
             <%= select_tag :complexity,
-                           options_for_select([['All Documents', '']] + document_complexities.map { |c| [c.to_s.titleize, c] }, params[:complexity]),
+                           options_for_select([['All Documents', '']] + document_complexities, params[:complexity]),
                            class: "select-custom w-full" + (params[:complexity].present? ? " active-highlight" : "") %>
           </div>
         <% end %>

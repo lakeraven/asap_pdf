@@ -68,6 +68,10 @@ class Site < ApplicationRecord
     }.to_h { |a| [a.nil? ? "None" : a, a.nil? ? "None" : a] }
   end
 
+  def has_complexities?
+    documents.where.not(complexity: [nil, ""]).any?
+  end
+
   def website
     return nil if primary_url.blank?
     primary_url.sub(/^https?:\/\//, "").sub(/\/$/, "")
