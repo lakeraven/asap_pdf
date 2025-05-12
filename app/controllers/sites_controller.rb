@@ -12,6 +12,7 @@ class SitesController < AuthenticatedController
   end
 
   def insights
+    # Build document list.
     @documents = @site.documents
       .by_category(params[:category])
       .by_department(params[:department])

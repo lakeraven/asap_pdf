@@ -23,9 +23,6 @@ class DocumentsController < AuthenticatedController
       .by_date_range(params[:start_date], params[:end_date])
       .order(sort_column => sort_direction)
       .page(params[:page])
-    @document_categories = Document::CONTENT_TYPES
-    @document_decisions = {"All Decisions": ""}.merge(Document::DECISION_TYPES.invert)
-    @document_complexities = Document::COMPLEXITIES.map { |c| [c.to_s.titleize, c] }
     @total_documents = @documents.total_count
     @status_values = Document::STATUSES.reject { |a| a == (params[:status].present? ? params[:status] : Document::DEFAULT_STATUS) }
   end

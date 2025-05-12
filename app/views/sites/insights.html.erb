@@ -17,7 +17,7 @@
                 <span class="label-text">Document Type</span>
               </label>
               <%= select_tag :category,
-                             options_for_select([['All Types', '']] + Document::CONTENT_TYPES.map { |c| [c.to_s.titleize, c] }, params[:category]),
+                             options_for_select([['All Types', '']] + Document::get_content_type_options, params[:category]),
                              class: "select-custom w-full" + (params[:category].present? ? " active-highlight" : "") %>
             </div>
             <% if @site.has_departments? %>
@@ -35,7 +35,7 @@
                 <span class="label-text">Audit Status</span>
               </label>
               <%= select_tag :status,
-                             options_for_select({ 'All Statuses': '' }.merge(Document::STATUSES.map { |item| [item, item] }.to_h), params[:status]),
+                             options_for_select({ 'All Statuses': '' }.merge(Document::get_status_options), params[:status]),
                              class: "select-custom w-full" + (params[:status].present? ? " active-highlight" : "")  %>
             </div>
             <div class="flex justify-end pt-4">

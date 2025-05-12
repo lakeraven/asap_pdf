@@ -87,6 +87,18 @@ class Document < ApplicationRecord
 
   before_validation :set_defaults
 
+  def self.get_content_type_options
+    Document::CONTENT_TYPES.map { |c| [c.to_s.titleize, c] }
+  end
+
+  def self.get_complexity_options
+    Document::COMPLEXITIES.map { |c| [c.to_s.titleize, c] }
+  end
+
+  def self.get_status_options
+    Document::STATUSES.map { |item| [item, item] }.to_h
+  end
+
   def modification_year
     if modification_date.present?
       modification_date.strftime("%Y")

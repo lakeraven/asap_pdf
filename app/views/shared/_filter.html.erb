@@ -29,7 +29,7 @@
             <span class="label-text">Document Type</span>
           </label>
           <%= select_tag :category,
-                         options_for_select([['All Types', '']] + document_categories.map { |c| [c.to_s.titleize, c] }, params[:category]),
+                         options_for_select([['All Types', '']] + Document::get_content_type_options, params[:category]),
                          class: "select-custom w-full" + (params[:category].present? ? " active-highlight" : "") %>
         </div>
         <div>
@@ -37,7 +37,7 @@
             <span class="label-text">Decision</span>
           </label>
           <%= select_tag :accessibility_recommendation,
-                         options_for_select(@document_decisions, params[:accessibility_recommendation]),
+                         options_for_select({"All Decisions": ""}.merge(Document::DECISION_TYPES.invert), params[:accessibility_recommendation]),
                          class: "select-custom w-full" + (params[:accessibility_recommendation].present? ? " active-highlight" : "") %>
         </div>
         <% if site.has_departments? %>
@@ -56,7 +56,7 @@
               <span class="label-text">Complexity</span>
             </label>
             <%= select_tag :complexity,
-                           options_for_select([['All Documents', '']] + document_complexities, params[:complexity]),
+                           options_for_select([['All Documents', '']] + Document::get_complexity_options, params[:complexity]),
                            class: "select-custom w-full" + (params[:complexity].present? ? " active-highlight" : "") %>
           </div>
         <% end %>
