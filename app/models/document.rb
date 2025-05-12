@@ -87,9 +87,9 @@ class Document < ApplicationRecord
 
   before_validation :set_defaults
 
-  def creation_year
-    if creation_date.present?
-      creation_date.strftime("%Y")
+  def modification_year
+    if modification_date.present?
+      modification_date.strftime("%Y")
     else
       "Unknown"
     end

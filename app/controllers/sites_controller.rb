@@ -20,7 +20,7 @@ class SitesController < AuthenticatedController
     end
     # Create binned date data for visualization.
     # First, gather all documents by year
-    year_groups = @documents.group_by(&:creation_year).map { |label, year_documents| [label, year_documents.size] }
+    year_groups = @documents.group_by(&:modification_year).map { |label, year_documents| [label, year_documents.size] }
     # Extract and remove "Unknown" to handle separately
     unknown_group = year_groups.find { |item| item[0] == "Unknown" }
     year_groups = year_groups.reject { |item| item[0] == "Unknown" }

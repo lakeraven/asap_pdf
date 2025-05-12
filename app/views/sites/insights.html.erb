@@ -79,8 +79,8 @@
                 </ul>
               </div>
             </div>
-            <div id="chart-creation-year" class="px-4">
-              <h2 class="pb-4">Document Creation Year</h2>
+            <div id="chart-modification-year" class="px-4">
+              <h2 class="pb-4">Document Last Modified Year</h2>
               <%= bar_chart @document_years, library: { scales: { y: { ticks: { autoSkip: false } } } }, colors: ["#ea3c48"] %>
               <div class="dropdown dropdown-start pt-6">
                 <div tabindex="0" role="button" class="btn btn-sm "><i class="fas fa-link w-5"></i>View Documents</div>
