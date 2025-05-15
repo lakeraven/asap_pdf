@@ -497,7 +497,7 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk-lambda
-  aws-sdk-s3 (~> 1.185)
+  aws-sdk-s3 (~> 1.186)
   aws-sdk-secretsmanager
   aws-sigv4
   bcrypt (~> 3.1)
