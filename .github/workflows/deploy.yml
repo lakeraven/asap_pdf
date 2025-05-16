@@ -110,6 +110,7 @@ jobs:
 
       - name: Initialize OpenTofu
         working-directory: ./terraform
+        run: tofu init
 
       - name: Apply changes
         working-directory: ./terraform
