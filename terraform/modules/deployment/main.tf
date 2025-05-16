@@ -219,6 +219,15 @@ resource "aws_iam_role_policy" "github_actions" {
           var.document_inference_evaluation_lambda_arn,
           var.evaluation_lambda_arn
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter"
+        ]
+        Resource = [
+          "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.project_name}/${var.environment}/app/version",
+        ]
       }
     ]
   })
