@@ -17,24 +17,24 @@ data "aws_iam_policy_document" "lambda_ecr" {
   }
 }
 
-resource "aws_ecr_repository" "app" {
-  name                 = "${var.project_name}-${var.environment}"
-  force_delete         = true
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  encryption_configuration {
-    encryption_type = "AES256"
-  }
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}"
-    Environment = var.environment
-  }
-}
+# resource "aws_ecr_repository" "app" {
+#   name                 = "${var.project_name}-${var.environment}"
+#   force_delete         = true
+#   image_tag_mutability = "MUTABLE"
+#
+#   image_scanning_configuration {
+#     scan_on_push = true
+#   }
+#
+#   encryption_configuration {
+#     encryption_type = "AES256"
+#   }
+#
+#   tags = {
+#     Name        = "${var.project_name}-${var.environment}"
+#     Environment = var.environment
+#   }
+# }
 
 # Document inference ECR repository.
 resource "aws_ecr_repository" "document_inference" {
@@ -198,14 +198,14 @@ resource "aws_iam_role_policy" "github_actions" {
         Action = [
           "logs:GetLogEvents"
         ]
-        Resource = "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/ecs/${var.project_name}-${var.environment}:*"
+        Resource = "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:log-group:/aws/ecs/${var.project_name}/${var.environment}/app:*"
       },
       {
         Effect = "Allow"
         Action = "iam:PassRole"
         Resource = [
-          "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-task-execution-role",
-          "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-task-role"
+          "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-app-execution",
+          "arn:aws:iam::${var.aws_account_id}:role/${var.project_name}-${var.environment}-app-task"
         ]
       },
       {
