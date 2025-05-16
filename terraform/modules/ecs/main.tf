@@ -17,9 +17,10 @@ module "fargate_service" {
   execution_policies = [aws_iam_policy.ecs_task_secrets_policy.arn, aws_iam_policy.ecs_s3_access.arn]
   task_policies = [aws_iam_policy.ecs_task_lambda_invoke_policy.arn]
 
-  enable_execute_command = true
-  public                 = true
-  health_check_path      = "/up"
+  enable_execute_command   = true
+  create_version_parameter = true
+  public                   = true
+  health_check_path        = "/up"
 
   environment_variables = {
     RAILS_ENV           = var.environment
@@ -32,13 +33,13 @@ module "fargate_service" {
   }
 
   environment_secrets = {
-    DB_HOST: var.db_host_secret_arn
-    DB_NAME: var.db_name_secret_arn
-    DB_USERNAME: var.db_username_secret_arn
-    DB_PASSWORD: var.db_password_secret_arn
-    SECRET_KEY_BASE: var.secret_key_base_secret_arn
-    RAILS_MASTER_KEY: var.rails_master_key_secret_arn
-    REDIS_URL: var.redis_url_secret_arn
+    DB_HOST : var.db_host_secret_arn
+    DB_NAME : var.db_name_secret_arn
+    DB_USERNAME : var.db_username_secret_arn
+    DB_PASSWORD : var.db_password_secret_arn
+    SECRET_KEY_BASE : var.secret_key_base_secret_arn
+    RAILS_MASTER_KEY : var.rails_master_key_secret_arn
+    REDIS_URL : var.redis_url_secret_arn
   }
 }
 
