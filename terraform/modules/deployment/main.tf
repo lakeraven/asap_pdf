@@ -56,7 +56,7 @@ resource "aws_ecr_repository" "document_inference" {
 }
 
 resource "aws_ecr_repository_policy" "document_inference" {
-  policy  = data.aws_iam_policy_document.lambda_ecr.json
+  policy     = data.aws_iam_policy_document.lambda_ecr.json
   repository = aws_ecr_repository.document_inference.name
 }
 
@@ -79,7 +79,7 @@ resource "aws_ecr_repository" "evaluation" {
 }
 
 resource "aws_ecr_repository_policy" "evaluation" {
-  policy  = data.aws_iam_policy_document.lambda_ecr.json
+  policy     = data.aws_iam_policy_document.lambda_ecr.json
   repository = aws_ecr_repository.evaluation.name
 }
 
@@ -102,7 +102,7 @@ resource "aws_ecr_repository" "document_inference_evaluation" {
 }
 
 resource "aws_ecr_repository_policy" "document_inference_evaluation" {
-  policy  = data.aws_iam_policy_document.lambda_ecr.json
+  policy     = data.aws_iam_policy_document.lambda_ecr.json
   repository = aws_ecr_repository.document_inference_evaluation.name
 }
 
@@ -231,6 +231,11 @@ resource "aws_iam_role_policy" "github_actions" {
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "github_readonly" {
+  role       = aws_iam_role.github_actions.id
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
 
 # Database Host Secret
