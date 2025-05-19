@@ -113,6 +113,8 @@ jobs:
         run: tofu init
 
       - name: Apply changes
+        env:
+          TF_LOG: "INFO"
         working-directory: ./terraform
         run: tofu apply --auto-approve
 
