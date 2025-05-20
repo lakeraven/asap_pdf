@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 
-name: TofuPlan
+name: Tofu Plan
 
 on:
   workflow_dispatch:
@@ -66,7 +66,7 @@ jobs:
         working-directory: ./terraform
         run: tofu init
 
-      - name: Apply changes
+      - name: Run tofu plan
         env:
           TF_LOG: "INFO"
         working-directory: ./terraform

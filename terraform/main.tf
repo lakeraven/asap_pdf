@@ -1,3 +1,18 @@
+terraform {
+  backend "s3" {
+    bucket = "${var.project_name}-${var.environment}-tfstate"
+    key    = "${var.project_name}.tfstate"
+    region = var.aws_region
+    dynamodb_table = "${var.environment}.tfstate"
+  }
+}
+module "backend" {
+  source = "github.com/codeforamerica/tofu-modules-aws-backend?ref=1.1.1"
+
+  project     = var.project_name
+  environment = var.environment
+}
+
 module "logging" {
   source = "github.com/codeforamerica/tofu-modules-aws-logging?ref=2.1.0"
 
