@@ -228,7 +228,26 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = [
           "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${var.project_name}/${var.environment}/app/version",
         ]
-      }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+        ]
+        Resource = [
+          "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/*.tfstate"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+        ]
+        Resource = [
+          "arn:aws:kms:${var.aws_region}:${var.aws_account_id}:key/${var.backend_kms_arn}"
+        ]
+      },
     ]
   })
 }

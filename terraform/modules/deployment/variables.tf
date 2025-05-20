@@ -87,3 +87,8 @@ variable "evaluation_lambda_arn" {
   type        = string
 }
 
+variable "backend_kms_arn" {
+  description = "Backend module's KMS key."
+  type        = string
+}
+

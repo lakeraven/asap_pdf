@@ -73,6 +73,7 @@ module "deployment" {
   db_name                = var.db_name
   rails_master_key       = var.rails_master_key
   aws_account_id         = var.aws_account_id
+  backend_kms_arn        = module.backend.kms_key
   redis_url = format("redis://%s:%s",
     module.cache.redis_endpoint,
     module.cache.redis_port
