@@ -259,7 +259,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "s3:PutObject",
         ]
         Resource = [
-          "arn:aws:s3:::${var.project_name}-${var.environment}-tfstate"
+          "arn:aws:s3:::${var.project_name}-${var.environment}-tfstate/*"
         ]
       },
       {
