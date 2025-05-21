@@ -6,14 +6,14 @@ resource "random_password" "db_password" {
 }
 
 # Store password in AWS Secrets Manager
-resource "aws_secretsmanager_secret" "db_password" {
-  name = "${var.project_name}-${var.environment}-db-password"
-}
+# resource "aws_secretsmanager_secret" "db_password" {
+#   name = "${var.project_name}-${var.environment}-db-password"
+# }
 
-resource "aws_secretsmanager_secret_version" "db_password" {
-  secret_id     = aws_secretsmanager_secret.db_password.id
-  secret_string = random_password.db_password.result
-}
+# resource "aws_secretsmanager_secret_version" "db_password" {
+#   secret_id     = aws_secretsmanager_secret.db_password.id
+#   secret_string = random_password.db_password.result
+# }
 
 # RDS subnet group
 resource "aws_db_subnet_group" "main" {

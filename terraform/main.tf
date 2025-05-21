@@ -15,6 +15,49 @@ module "backend" {
   environment = var.environment
 }
 
+module "secrets" {
+  source = "github.com/codeforamerica/tofu-modules-aws-secrets?ref=1.0.0"
+
+  project     = var.project_name
+  environment = var.environment
+
+  secrets = {
+    database = {
+      description = "Credentials for our Database."
+      name = "/asap-pdf/production/database"
+      start_value = jsonencode({
+        host = ""
+        name = ""
+        username = ""
+        password = ""
+      })
+    }
+    redis = {
+      description = "The Redis/Elasticache url."
+      name = "/asap-pdf/production/redis"
+      start_value = jsonencode({
+        url = ""
+      })
+    }
+    rails = {
+      description = "The Rails master key."
+      name = "/asap-pdf/production/rails"
+      start_value = jsonencode({
+        master_key = ""
+        secret_key = ""
+      })
+    }
+    google = {
+      description = "The Rails master key."
+      name = "/asap-pdf/production/GOOGLE_AI_KEY"
+    }
+    anthropic = {
+      description = "The Rails master key."
+      name = "/asap-pdf/production/ANTHROPIC_KEY"
+    }
+  }
+}
+
 module "logging" {
   source = "github.com/codeforamerica/tofu-modules-aws-logging?ref=2.1.0"
 
@@ -59,55 +102,12 @@ module "deployment" {
   project_name      = var.project_name
   environment       = var.environment
 
-  db_password_secret_arn = module.database.db_password_secret_arn
+  db_password_secret_arn = "${module.secrets.secrets["database"].secret_arn}:password"
   aws_account_id         = data.aws_caller_identity.identity.account_id
   backend_kms_arn        = module.backend.kms_key
   document_inference_lambda_arn            = module.lambda.document_inference_lambda_arn
   document_inference_evaluation_lambda_arn = module.lambda.document_inference_evaluation_lambda_arn
   evaluation_lambda_arn                    = module.lambda.evaluation_lambda_arn
-}
-
-module "secrets" {
-  source = "github.com/codeforamerica/tofu-modules-aws-secrets?ref=1.0.0"
-
-  project     = var.project_name
-  environment = var.environment
-
-  secrets = {
-    database = {
-      description = "Credentials for our Database."
-      name = "/asap-pdf/production/database"
-      start_value = jsonencode({
-        host = ""
-        name = ""
-        username = ""
-        password = ""
-      })
-    }
-    redis = {
-      description = "The Redis/Elasticache url."
-      name = "/asap-pdf/production/redis"
-      start_value = jsonencode({
-        url = ""
-      })
-    }
-    rails = {
-      description = "The Rails master key."
-      name = "/asap-pdf/production/rails"
-      start_value = jsonencode({
-        master_key = ""
-        secret_key = ""
-      })
-    }
-    google = {
-      description = "The Rails master key."
-      name = "/asap-pdf/production/GOOGLE_AI_KEY"
-    }
-    anthropic = {
-      description = "The Rails master key."
-      name = "/asap-pdf/production/ANTHROPIC_KEY"
-    }
-  }
 }
 
 # ECS
