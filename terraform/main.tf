@@ -1,3 +1,5 @@
+data "aws_caller_identity" "identity" {}
+
 terraform {
   backend "s3" {
     bucket = "${var.project_name}-${var.environment}-tfstate"
@@ -26,10 +28,7 @@ module "networking" {
 
   project_name         = var.project_name
   environment          = var.environment
-  vpc_cidr             = var.vpc_cidr
   availability_zones = ["us-east-1a", "us-east-1b"]
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
   logging_key_id       = module.logging.kms_key_arn
 }
 
@@ -41,10 +40,6 @@ module "database" {
   environment       = var.environment
   subnet_ids        = module.networking.private_subnet_ids
   security_group_id = module.networking.rds_security_group_id
-  instance_class    = var.db_instance_class
-  allocated_storage = var.db_allocated_storage
-  db_name           = var.db_name
-  db_username       = var.db_username
 }
 
 # Redis for Sidekiq
@@ -55,8 +50,6 @@ module "cache" {
   environment       = var.environment
   subnet_ids        = module.networking.private_subnet_ids
   security_group_id = module.networking.redis_security_group_id
-  node_type         = var.redis_node_type
-  port              = var.redis_port
 }
 
 # Deployment resources (ECR, GitHub Actions, Secrets)
@@ -65,22 +58,10 @@ module "deployment" {
 
   project_name      = var.project_name
   environment       = var.environment
-  github_repository = var.github_repository
 
-  db_username            = var.db_username
   db_password_secret_arn = module.database.db_password_secret_arn
-  db_endpoint            = module.database.db_instance_endpoint
-  db_name                = var.db_name
-  rails_master_key       = var.rails_master_key
-  aws_account_id         = var.aws_account_id
+  aws_account_id         = data.aws_caller_identity.identity.account_id
   backend_kms_arn        = module.backend.kms_key
-  redis_url = format("redis://%s:%s",
-    module.cache.redis_endpoint,
-    module.cache.redis_port
-  )
-  secret_key_base                          = var.secret_key_base
-  google_ai_key                            = var.google_ai_key
-  anthropic_key                            = var.anthropic_key
   document_inference_lambda_arn            = module.lambda.document_inference_lambda_arn
   document_inference_evaluation_lambda_arn = module.lambda.document_inference_evaluation_lambda_arn
   evaluation_lambda_arn                    = module.lambda.evaluation_lambda_arn
@@ -117,6 +98,14 @@ module "secrets" {
         master_key = ""
         secret_key = ""
       })
+    }
+    google = {
+      description = "The Rails master key."
+      name = "/asap-pdf/production/GOOGLE_AI_KEY"
+    }
+    anthropic = {
+      description = "The Rails master key."
+      name = "/asap-pdf/production/ANTHROPIC_KEY"
     }
   }
 }
@@ -162,8 +151,8 @@ module "lambda" {
   document_inference_ecr_repository_url            = module.deployment.document_inference_ecr_repository_url
   evaluation_ecr_repository_url                    = module.deployment.evaluation_ecr_repository_url
   document_inference_evaluation_ecr_repository_url = module.deployment.document_inference_evaluation_ecr_repository_url
-  secret_google_ai_key_arn                         = module.deployment.gemini_key_secret_arn
-  secret_anthropic_key_arn                         = module.deployment.anthropic_key_secret_arn
+  secret_google_ai_key_arn                         = module.secrets.secrets["google"].secret_arn
+  secret_anthropic_key_arn                         = module.secrets.secrets["anthropic"].secret_arn
   s3_document_bucket_arn                           = aws_s3_bucket.documents.arn
 }
 
