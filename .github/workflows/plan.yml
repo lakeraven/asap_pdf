@@ -80,7 +80,7 @@ jobs:
           TF_LOG: "DEBUG"
         timeout-minutes: 5
         working-directory: ./terraform
-        run: tofu plan -no-color
+        run: tofu plan -input=false
 
       - name: Output stdout
         if: always()
