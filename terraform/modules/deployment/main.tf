@@ -234,6 +234,7 @@ resource "aws_iam_role_policy" "github_actions" {
         Action = [
           "dynamodb:PutItem",
           "dynamodb:GetItem",
+          "dynamodb:DeleteItem",
         ]
         Resource = [
           "arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/*.tfstate"
