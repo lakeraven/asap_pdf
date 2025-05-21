@@ -67,6 +67,7 @@ jobs:
         run: tofu init
 
       - name: Run tofu plan
+        id: plan
         env:
           TF_LOG: "INFO"
         timeout-minutes: 5
