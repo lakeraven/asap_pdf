@@ -80,10 +80,6 @@ jobs:
         working-directory: ./terraform
         run: tofu plan -input=false
 
-      - name: Output stdout
-        if: always()
-        run: echo ${{ steps.plan.outputs.stdout }}
-
       - name: Output stderr
         if: always()
         run: echo ${{ steps.plan.outputs.stderr }}

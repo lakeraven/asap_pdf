@@ -189,7 +189,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:ListTaskDefinitions",
           "ecs:DescribeTaskDefinition",
           "ecs:ListTasks",
-          "ecs:DescribeTasks"
+          "ecs:DescribeTasks",
+          "ecs:TagResource"
         ]
         Resource = "*"
       },
