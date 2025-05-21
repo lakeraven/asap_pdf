@@ -74,6 +74,14 @@ jobs:
         working-directory: ./terraform
         run: tofu plan -no-color
 
-      - run: echo ${{ steps.plan.outputs.stdout }}
-      - run: echo ${{ steps.plan.outputs.stderr }}
-      - run: echo ${{ steps.plan.outputs.exitcode }}
+      - name: Output stdout
+        if: always()
+        run: echo ${{ steps.plan.outputs.stdout }}
+
+      - name: Output stderr
+        if: always()
+        run: echo ${{ steps.plan.outputs.stderr }}
+
+      - name: Output exitcode
+        if: always()
+        run: echo ${{ steps.plan.outputs.exitcode }}
