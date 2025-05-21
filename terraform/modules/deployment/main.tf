@@ -259,6 +259,15 @@ resource "aws_iam_role_policy" "github_actions" {
           "arn:aws:s3:::${var.project_name}-${var.environment}-tfstate"
         ]
       },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+        ]
+        Resource = [
+          "arn:aws:secretsmanager:${var.aws_region}:${var.aws_account_id}:secret:/${var.project_name}/${var.environment}/*"
+        ]
+      }
     ]
   })
 }
