@@ -76,8 +76,6 @@ jobs:
 
       - name: Run tofu plan
         id: plan
-        env:
-          TF_LOG: "DEBUG"
         timeout-minutes: 5
         working-directory: ./terraform
         run: tofu plan -input=false
