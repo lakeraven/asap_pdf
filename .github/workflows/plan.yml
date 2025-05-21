@@ -66,6 +66,10 @@ jobs:
         working-directory: ./terraform
         run: tofu init
 
+      - name: List out state
+        working-directory: ./terraform
+        run: tofu state list
+
       - name: Run tofu plan
         id: plan
         env:

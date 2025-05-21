@@ -248,6 +248,17 @@ resource "aws_iam_role_policy" "github_actions" {
           "arn:aws:kms:${var.aws_region}:${var.aws_account_id}:key/${var.backend_kms_arn}"
         ]
       },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.project_name}-${var.environment}-tfstate"
+        ]
+      },
     ]
   })
 }
