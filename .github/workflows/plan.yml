@@ -66,6 +66,10 @@ jobs:
         working-directory: ./terraform
         run: tofu init
 
+      - name: Get OpenTofu version
+        working-directory: ./terraform
+        run: tofu --version
+
       - name: List out state
         working-directory: ./terraform
         run: tofu state list
