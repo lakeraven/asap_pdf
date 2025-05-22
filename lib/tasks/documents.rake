@@ -128,23 +128,6 @@ namespace :documents do
     end
   end
 
-  desc "Update statuses."
-  task update_statuses: :environment do
-    PaperTrail.request(enabled: false) do
-      Document.find_each do |document|
-        document.status = case document.status
-        when "In Review"
-          Document::IN_REVIEW_STATUS
-        when "Audit Done"
-          Document::DONE_STATUS
-        else
-          Document::DEFAULT_STATUS
-        end
-        document.save
-      end
-    end
-  end
-
   desc "Update departments."
   task :update_department, [:site_id] => :environment do |t, args|
     Document.where(site_id: args.site_id).each do |document|
