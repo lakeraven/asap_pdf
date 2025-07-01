@@ -34,7 +34,7 @@ group :development, :test do
 end
 
 group :development do
-  gem "overcommit", "~> 0.67.1"
+  gem "overcommit", "~> 0.68.0"
   gem "better_errors", "~> 2.10"
   gem "ruby-lsp", "~> 0.24"
   gem "web-console"
@@ -55,13 +55,13 @@ group :test do
 end
 
 gem "bcrypt", "~> 3.1"
-gem "aws-sdk-s3", "~> 1.189"  # For S3 versioning support
+gem "aws-sdk-s3", "~> 1.191"  # For S3 versioning support
 gem "aws-sdk-secretsmanager"
 gem "aws-sdk-lambda"
 gem "aws-sigv4"
 
 # API and Documentation
-gem "grape", "~> 2.3"
+gem "grape", "~> 2.4"
 gem "grape-swagger"
 
 gem "paper_trail", "~> 16.0"
