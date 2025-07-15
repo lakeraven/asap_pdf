@@ -1,14 +1,13 @@
 Rails.application.routes.draw do
+  devise_for :users, controllers: {
+    sessions: "users/sessions",
+    passwords: "users/passwords",
+    registrations: "users/registrations"
+  }
+  # Administrative user paths.
+  resources :users, only: [:index, :new, :create, :edit, :update], controller: "users/admin"
+
   get "up" => "rails/health#show", :as => :rails_health_check
-
-  resource :session
-  get "login", to: "sessions#new", as: :login
-
-  resources :dashboard, only: [:index] do
-    collection do
-      post :upload_pdf
-    end
-  end
 
   resources :sites do
     member do
