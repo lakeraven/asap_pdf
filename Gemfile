@@ -54,6 +54,7 @@ group :test do
   gem "rails-controller-testing"
   gem "factory_bot_rails", "~> 6.5"
   gem "capybara"
+  gem "capybara-email"
   gem "webdrivers"
 end
 
@@ -62,6 +63,7 @@ gem "aws-sdk-s3", "~> 1.194"  # For S3 versioning support
 gem "aws-sdk-secretsmanager"
 gem "aws-sdk-lambda"
 gem "aws-sigv4"
+gem "aws-sdk-ses"
 
 # API and Documentation
 gem "grape", "~> 2.4"
