@@ -1,4 +1,4 @@
-<div class="card ml-4 mr-4 xl:w-1/4 xl:mr-auto xl:ml-auto bg-gray-50 shadow-xl mt-12">
+<div class="card ml-4 mr-4 lg:w-1/3 lg:mr-auto lg:ml-auto bg-gray-50 shadow-xl mt-12">
   <div class="card-body">
     <h1 class="text-lg font-medium">Edit <%= @user.email %></h1>
 
@@ -67,7 +67,7 @@
         <%= f.label :site_id, "Site", class: "label-text text-black mb-2 font-semibold" %>
         <%= f.select :site_id, grouped_options_for_select(@sites, @user.site_id),
                      { include_blank: "None" },
-                     { class: "input input-bordered w-full select" } %>
+                     { class: "input input-bordered w-full select border-black" } %>
       </div>
 
       <div class="actions flex gap-4 items-center mt-6">
