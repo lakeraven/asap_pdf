@@ -112,11 +112,6 @@ jobs:
         working-directory: ./terraform
         run: tofu init
 
-      - name: Refresh OpenTofu state for SSM parameter
-        working-directory: ./terraform
-        run: |
-          tofu refresh -target="module.fargate_service.aws_ssm_parameter.version[\"this\"]"        
-
       - name: Apply changes
         working-directory: ./terraform
         run: tofu apply --auto-approve

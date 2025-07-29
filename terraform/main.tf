@@ -148,7 +148,7 @@ module "ecs" {
   db_password_secret_arn      = "${module.secrets.secrets["database"].secret_arn}:password"
   secret_key_base_secret_arn  = "${module.secrets.secrets["rails"].secret_arn}:secret_key"
   rails_master_key_secret_arn = "${module.secrets.secrets["rails"].secret_arn}:master_key"
-  smtp_endpoint_secret_arn    = "${module.secrets.secrets["smtp"].secret_arn}:ednpoint"
+  smtp_endpoint_secret_arn    = "${module.secrets.secrets["smtp"].secret_arn}:endpoint"
   smtp_user_secret_arn        = "${module.secrets.secrets["smtp"].secret_arn}:user"
   smtp_password_secret_arn    = "${module.secrets.secrets["smtp"].secret_arn}:password"
   redis_url_secret_arn        = "${module.secrets.secrets["redis"].secret_arn}:url"
