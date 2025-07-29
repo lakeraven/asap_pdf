@@ -29,11 +29,11 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: ENV.fetch("SMTP_ENDPOINT"),
+    address: ENV.fetch("SMTP_ENDPOINT", ""),
     port: 587,
     domain: "demo.codeforamerica.ai",
-    user_name: ENV.fetch("SMTP_USER"),
-    password: ENV.fetch("SMTP_PASSWORD"),
+    user_name: ENV.fetch("SMTP_USER", ""),
+    password: ENV.fetch("SMTP_PASSWORD", ""),
     authentication: "plain"
   }
   config.action_mailer.perform_deliveries = true
