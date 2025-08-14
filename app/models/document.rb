@@ -256,18 +256,31 @@ class Document < ApplicationRecord
 
   def inference_recommendation!
     if Rails.env.to_s != "production"
-      lambda_manager = AwsLambdaManager.new(function_url: "http://localhost:9002/2015-03-31/functions/function/invocations")
+      lambda_manager = AwsLambdaManager.new(function_url: "http://localhost:9003/2015-03-31/functions/function/invocations")
       api_host = "http://host.docker.internal:3000"
     else
       lambda_manager = AwsLambdaManager.new(function_name: "asap-pdf-document-inference-production")
       api_host = "https://demo.codeforamerica.ai"
     end
     payload = {
-      model_name: "gemini-2.5-pro-preview-03-25",
-      documents: [{id: id, title: file_name, url: normalized_url, purpose: document_category, creation_date: creation_date}],
-      page_limit: 7,
-      inference_type: "exception",
-      asap_endpoint: "#{api_host}/api/documents/#{id}/inference"
+      inference_model: "gemini-1.5-pro-latest",
+      evaluation_model: "gemini-2.5-pro-preview-03-25",
+      evaluation_component: "exception",
+      branch_name: "main",
+      commit_sha: "local-dev",
+      documents: [{
+        file_name: file_name,
+        category: document_category || "Unknown",
+        created_date: creation_date&.strftime("%Y-%m-%d") || Date.current.strftime("%Y-%m-%d"),
+        modification_date: modification_date&.strftime("%Y-%m-%d") || Date.current.strftime("%Y-%m-%d"),
+        url: normalized_url,
+        human_summary: summary || "No summary available",
+        human_exception: {
+          "is_archival": false,
+          "is_application": false
+        }
+      }],
+      page_limit: 7
     }
     begin
       response = lambda_manager.invoke_lambda!(payload)
