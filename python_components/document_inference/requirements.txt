@@ -1,6 +1,6 @@
 awslambdaric==3.0.2
 backports.tarfile==1.2.0
-black==25.1.0
+black==26.10.1
 boto3==1.37.10
 document-inference==0.0.0
 flake8==7.1.2
